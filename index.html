@@ -5,22 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Foot Europa Report</title>
 <style>
-    body { font-family: Arial, Helvetica, sans-serif; background: #f4f4f4; margin:0; padding:0; }
-    header { background:#000; color:#fff; padding:15px 20px; text-align:center; font-size:2em; font-weight:bold; }
-    main { width:90%; max-width:1200px; margin:20px auto; }
-    .top-story { text-align:center; font-size:1.8em; font-weight:bold; margin-bottom:30px; }
-    .category-tabs { display:flex; gap:10px; margin-bottom:20px; justify-content:center; }
-    .category-tabs button { padding:10px 20px; background:#000; color:#fff; border:none; cursor:pointer; border-radius:4px; transition: background 0.3s; }
-    .category-tabs button.active { background:#0066cc; }
-    .category-tabs button:hover { background:#333; }
-    .news-section { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
-    .column { flex:1; min-width:250px; }
-    .headline { margin:8px 0; }
-    .headline a { text-decoration:none; color:#000; display:block; }
-    .headline a:hover { text-decoration:underline; }
-    footer { text-align:center; margin:40px 0; font-size:0.9em; color:#555; }
-    .hidden { display:none; }
-    img { max-width:100%; border-radius:4px; display:block; margin-bottom:10px; object-fit:cover; }
+body { font-family: Arial, Helvetica, sans-serif; background: #f4f4f4; margin:0; padding:0; }
+header { background:#000; color:#fff; padding:15px 20px; text-align:center; font-size:2em; font-weight:bold; }
+main { width:90%; max-width:1200px; margin:20px auto; }
+.top-story { text-align:center; font-size:1.8em; font-weight:bold; margin-bottom:30px; }
+.category-tabs { display:flex; gap:10px; margin-bottom:20px; justify-content:center; }
+.category-tabs button { padding:10px 20px; background:#000; color:#fff; border:none; cursor:pointer; border-radius:4px; transition: background 0.3s; }
+.category-tabs button.active { background:#0066cc; }
+.category-tabs button:hover { background:#333; }
+.news-section { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+.column { flex:1; min-width:250px; }
+.column h3 { background:#000; color:#fff; padding:8px; margin-bottom:10px; border-radius:4px; text-align:center; }
+.headline { margin:8px 0; }
+.headline a { text-decoration:none; color:#000; display:block; }
+.headline a:hover { text-decoration:underline; }
+footer { text-align:center; margin:40px 0; font-size:0.9em; color:#555; }
+.hidden { display:none; }
+img { max-width:100%; border-radius:4px; display:block; margin-bottom:10px; object-fit:cover; }
 </style>
 </head>
 <body>
@@ -39,12 +40,30 @@
 
     <!-- News Section -->
     <div id="news" class="news-section">
-        <div class="column"><div id="pl-news"></div></div>
-        <div class="column"><div id="laliga-news"></div></div>
-        <div class="column"><div id="seriea-news"></div></div>
-        <div class="column"><div id="bundesliga-news"></div></div>
-        <div class="column"><div id="ligue1-news"></div></div>
-        <div class="column"><div id="ucl-news"></div></div>
+        <div class="column">
+            <h3>Premier League</h3>
+            <div id="pl-news"></div>
+        </div>
+        <div class="column">
+            <h3>La Liga</h3>
+            <div id="laliga-news"></div>
+        </div>
+        <div class="column">
+            <h3>Serie A</h3>
+            <div id="seriea-news"></div>
+        </div>
+        <div class="column">
+            <h3>Bundesliga</h3>
+            <div id="bundesliga-news"></div>
+        </div>
+        <div class="column">
+            <h3>Ligue 1</h3>
+            <div id="ligue1-news"></div>
+        </div>
+        <div class="column">
+            <h3>UEFA Champions League</h3>
+            <div id="ucl-news"></div>
+        </div>
     </div>
 
     <!-- Transfers Section -->
