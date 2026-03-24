@@ -1,24 +1,9 @@
 const feeds = {
-    "pl-news": [
-        "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
-        "https://www.espn.com/espn/rss/soccer/news?league=eng.1"
-    ],
-    "laliga-news": [
-        "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
-        "https://www.espn.com/espn/rss/soccer/news?league=esp.1"
-    ],
-    "seriea-news": [
-        "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
-        "https://www.espn.com/espn/rss/soccer/news?league=ita.1"
-    ],
-    "bundesliga-news": [
-        "https://www.bbc.co.uk/sport/football/german-bundesliga/rss.xml",
-        "https://www.espn.com/espn/rss/soccer/news?league=ger.1"
-    ],
-    "ligue1-news": [
-        "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml",
-        "https://www.espn.com/espn/rss/soccer/news?league=fra.1"
-    ]
+    "pl-news": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
+    "laliga-news": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
+    "seriea-news": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
+    "bundesliga-news": "https://www.bbc.co.uk/sport/football/german-bundesliga/rss.xml",
+    "ligue1-news": "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml"
 };
 
 const topStoryDiv = document.getElementById('top-story');
@@ -30,7 +15,7 @@ async function fetchRSS(url){
         const data = await res.json();
         return data.items || [];
     } catch(e){
-        console.error("RSS fetch failed:", url, e);
+        console.error(e);
         return [];
     }
 }
@@ -48,27 +33,6 @@ function upgradeImage(url){
     return url;
 }
 
-// Fetch all feeds for a league, merge, filter football, sort by date
-async function fetchLeagueArticles(feedArray){
-    const allArticles = [];
-
-    await Promise.all(feedArray.map(async (feed) => {
-        const items = await fetchRSS(feed);
-        items.forEach(item => {
-            const title = item.title.toLowerCase();
-            const categories = (item.categories || []).map(c => c.toLowerCase());
-            if(title.includes("football") || title.includes("soccer") || categories.includes("football") || categories.includes("soccer")){
-                allArticles.push(item);
-            }
-        });
-    }));
-
-    // Sort newest first
-    allArticles.sort((a,b) => new Date(b.pubDate) - new Date(a.pubDate));
-
-    return allArticles.slice(0,5);
-}
-
 async function loadNews(){
     let topSet = false;
 
@@ -76,16 +40,15 @@ async function loadNews(){
         const container = document.getElementById(section);
         if(!container) continue;
 
+        let items = await fetchRSS(feeds[section]);
+
         container.innerHTML = '';
-
-        const items = await fetchLeagueArticles(feeds[section]);
-
         if(items.length === 0){
             container.innerHTML = '<p style="color:#999;">No articles available</p>';
             continue;
         }
 
-        items.forEach(item => {
+        items.slice(0,5).forEach(item=>{
             let img = item.enclosure?.link || item.thumbnail || item.image || extractImage(item.description);
             img = upgradeImage(img);
 
@@ -98,7 +61,7 @@ async function loadNews(){
             }
             html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
 
-            // Top story: first article with image
+            // Top story: only image + title
             if(!topSet && img){
                 topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
                                          <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.3em; display:block; margin-top:5px;">${item.title}</a>`;
