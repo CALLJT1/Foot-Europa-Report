@@ -1,4 +1,4 @@
-onst feeds = {
+const feeds = {
 
 "pl-news":"https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
 "laliga-news":"https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
@@ -17,13 +17,26 @@ const topStoryDiv=document.getElementById("top-story");
 
 async function fetchRSS(feedUrl){
 
-const api=`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
+const api=`https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`;
 
 try{
 
 const response=await fetch(api);
 const data=await response.json();
-return data.items || [];
+
+const parser=new DOMParser();
+const xml=parser.parseFromString(data.contents,"text/xml");
+
+const items=[...xml.querySelectorAll("item")].map(item=>({
+
+title:item.querySelector("title")?.textContent,
+link:item.querySelector("link")?.textContent,
+pubDate:item.querySelector("pubDate")?.textContent,
+description:item.querySelector("description")?.textContent
+
+}));
+
+return items;
 
 }catch(err){
 
@@ -39,19 +52,8 @@ function extractImage(description){
 if(!description)return null;
 
 const match=description.match(/<img[^>]+src="([^">]+)"/);
+
 return match?match[1]:null;
-
-}
-
-function upgradeImage(image){
-
-if(!image)return null;
-
-if(image.includes("ichef.bbci.co.uk")){
-return image.replace(/\/\d+\//,"/1280/");
-}
-
-return image;
 
 }
 
@@ -62,6 +64,7 @@ let topStorySet=false;
 for(const section in feeds){
 
 const container=document.getElementById(section);
+
 if(!container)continue;
 
 const items=await fetchRSS(feeds[section]);
@@ -78,20 +81,17 @@ continue;
 items.slice(0,5).forEach(item=>{
 
 const div=document.createElement("div");
+
 div.className="headline";
 
-let image=null;
-
-if(item.thumbnail)image=item.thumbnail;
-else if(item.enclosure && item.enclosure.link)image=item.enclosure.link;
-else if(item.description)image=extractImage(item.description);
-
-image=upgradeImage(image);
+let image=extractImage(item.description);
 
 let html="";
 
 if(image){
+
 html+=`<img src="${image}" style="margin-bottom:8px">`;
+
 }
 
 html+=`
@@ -119,6 +119,7 @@ Follow your club
 `;
 
 div.innerHTML=html;
+
 container.appendChild(div);
 
 if(!topStorySet && image){
