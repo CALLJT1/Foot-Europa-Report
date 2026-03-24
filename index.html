@@ -7,45 +7,257 @@
     <style>
         body { font-family: Arial, Helvetica, sans-serif; background: #f4f4f4; margin:0; padding:0; }
         header { background:#000; color:#fff; padding:10px 20px; text-align:center; font-size:2em; font-weight:bold;}
-        main { width:90%; max-width:1000px; margin:20px auto; }
-        .top-story { font-size:1.8em; font-weight:bold; margin-bottom:15px; }
+        main { width:90%; max-width:1200px; margin:20px auto; }
+        .top-story { font-size:1.8em; font-weight:bold; margin-bottom:20px; }
+        .category-tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+        .category-tabs button { padding:10px 20px; background:#000; color:#fff; border:none; cursor:pointer; border-radius:4px; }
+        .category-tabs button.active { background:#0066cc; }
+        .category-tabs button:hover { background:#333; }
         .news-section { display:flex; flex-wrap:wrap; gap:20px; }
-        .column { flex:1; min-width:200px; }
+        .column { flex:1; min-width:250px; }
+        .column h3 { background:#000; color:#fff; padding:10px; margin:0 0 10px 0; border-radius:4px; }
         .headline { font-size:1.1em; margin:8px 0; }
         .headline a { color:#000; text-decoration:none; }
         .headline a:hover { text-decoration:underline; }
         footer { text-align:center; margin:40px 0; font-size:0.9em; color:#555; }
+        .hidden { display:none; }
     </style>
 </head>
 <body>
 
-<header>Foot Europa Report</header>
+<header>⚽ Foot Europa Report</header>
 
 <main>
     <div id="top-story" class="top-story">Loading top story...</div>
 
-    <div class="news-section">
+    <div class="category-tabs">
+        <button class="active" onclick="showCategory('news')">📰 News</button>
+        <button onclick="showCategory('transfers')">🔄 Transfers</button>
+        <button onclick="showCategory('standings')">📊 Standings</button>
+        <button onclick="showCategory('results')">🎯 Results & Fixtures</button>
+    </div>
+
+    <!-- News Section -->
+    <div id="news" class="news-section">
         <div class="column">
             <h3>Premier League</h3>
-            <div id="premier-league">Loading...</div>
+            <div id="pl-news">Loading...</div>
         </div>
         <div class="column">
             <h3>La Liga</h3>
-            <div id="la-liga">Loading...</div>
+            <div id="laliga-news">Loading...</div>
         </div>
         <div class="column">
             <h3>Serie A</h3>
-            <div id="serie-a">Loading...</div>
+            <div id="seriea-news">Loading...</div>
         </div>
         <div class="column">
-            <h3>Other Leagues</h3>
-            <div id="other-leagues">Loading...</div>
+            <h3>Bundesliga</h3>
+            <div id="bundesliga-news">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>Ligue 1</h3>
+            <div id="ligue1-news">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>UEFA Champions League</h3>
+            <div id="ucl-news">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Transfers Section -->
+    <div id="transfers" class="news-section hidden">
+        <div class="column">
+            <h3>Transfer News</h3>
+            <div id="transfer-news">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>Sky Sports Transfers</h3>
+            <div id="skysports-transfers">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>ESPN Transfers</h3>
+            <div id="espn-transfers">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Standings Section -->
+    <div id="standings" class="news-section hidden">
+        <div class="column">
+            <h3>League Tables</h3>
+            <div id="standings-info">Loading standings data...</div>
+        </div>
+    </div>
+
+    <!-- Results & Fixtures Section -->
+    <div id="results" class="news-section hidden">
+        <div class="column">
+            <h3>Match Results & Fixtures</h3>
+            <div id="results-info">Loading results and fixtures...</div>
         </div>
     </div>
 </main>
 
-<footer>© 2026 Foot Europa Report | Live news from RSS feeds</footer>
+<footer>© 2026 Foot Europa Report | Live news from multiple sources</footer>
 
 <script src="news.js"></script>
 </body>
 </html>
+Now go to: https://github.com/CALLJT1/Foot-Europa-Report/blob/main/news.js
+
+Click the pencil (Edit) icon and replace ALL content with this:
+
+JavaScript
+// news.js
+
+const feeds = {
+    // News Feeds
+    "pl-news": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
+    "laliga-news": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
+    "seriea-news": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
+    "bundesliga-news": "https://www.bbc.co.uk/sport/football/german-bundesliga/rss.xml",
+    "ligue1-news": "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml",
+    "ucl-news": "https://www.bbc.co.uk/sport/football/european-cup/rss.xml",
+    
+    // Transfer Feeds
+    "transfer-news": "https://www.bbc.co.uk/sport/football/transfers/rss.xml",
+    "skysports-transfers": "https://www.skysports.com/transfer-news/rss.xml",
+    "espn-transfers": "https://www.espn.com/espn/rss/soccer/news"
+};
+
+const topStoryDiv = document.getElementById('top-story');
+
+async function fetchRSS(feedUrl) {
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        return data.items || [];
+    } catch (err) {
+        console.error('Error fetching RSS:', err);
+        return [];
+    }
+}
+
+function extractImageFromDescription(description) {
+    if (!description) return null;
+    const imgMatch = description.match(/<img[^>]+src="([^">]+)"/);
+    return imgMatch ? imgMatch[1] : null;
+}
+
+function upgradeImageQuality(imageUrl) {
+    if (!imageUrl) return null;
+    
+    // Upgrade BBC images
+    if (imageUrl.includes('ichef.bbci.co.uk')) {
+        imageUrl = imageUrl.replace(/\/\d+\//, '/1280/');
+        return imageUrl;
+    }
+    
+    // Upgrade ESPN images
+    if (imageUrl.includes('espn')) {
+        return imageUrl.replace(/\?.*$/, '?w=1280');
+    }
+    
+    return imageUrl;
+}
+
+async function loadNews() {
+    let topStorySet = false;
+    
+    for (const section in feeds) {
+        const container = document.getElementById(section);
+        if (!container) continue;
+        
+        try {
+            const items = await fetchRSS(feeds[section]);
+            container.innerHTML = '';
+            
+            if (items.length === 0) {
+                container.innerHTML = '<p style="color:#999;">No articles available</p>';
+                continue;
+            }
+            
+            items.slice(0, 5).forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'headline';
+                div.style.marginBottom = '15px';
+                div.style.paddingBottom = '15px';
+                div.style.borderBottom = '1px solid #ddd';
+                
+                // Get image
+                let imageUrl = null;
+                
+                if (item.enclosure && item.enclosure.link) {
+                    imageUrl = item.enclosure.link;
+                } else if (item.thumbnail) {
+                    imageUrl = item.thumbnail;
+                } else if (item.image) {
+                    imageUrl = item.image;
+                } else if (item.description) {
+                    imageUrl = extractImageFromDescription(item.description);
+                }
+                
+                // Upgrade image quality
+                imageUrl = upgradeImageQuality(imageUrl);
+                
+                // Build HTML
+                let html = '';
+                
+                if (imageUrl) {
+                    html += `<img src="${imageUrl}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:10px; border-radius:4px; object-fit:cover;" onerror="this.style.display='none'">`;
+                }
+                
+                html += `
+                    <a href="${item.link}" target="_blank" style="font-weight:bold; text-decoration:none; color:#000; display:block;">
+                        ${item.title}
+                    </a>
+                    <p style="font-size:0.85em; color:#999; margin-top:5px; margin-bottom:0;">
+                        ${item.pubDate ? new Date(item.pubDate).toLocaleDateString() : 'Recent'}
+                    </p>
+                `;
+                
+                div.innerHTML = html;
+                container.appendChild(div);
+                
+                // Set top story
+                if (!topStorySet && imageUrl) {
+                    topStoryDiv.innerHTML = `
+                        <img src="${imageUrl}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:15px; border-radius:4px; object-fit:cover;" onerror="this.style.display='none'">
+                        <a href="${item.link}" target="_blank" style="font-weight:bold; text-decoration:none; color:#000; font-size:1.5em;">
+                            ${item.title}
+                        </a>
+                    `;
+                    topStorySet = true;
+                }
+            });
+        } catch (err) {
+            container.innerHTML = '<p style="color:#cc0000;">Failed to load articles</p>';
+            console.error(`Error fetching ${section}:`, err);
+        }
+    }
+}
+
+function showCategory(category) {
+    // Hide all sections
+    document.getElementById('news').classList.add('hidden');
+    document.getElementById('transfers').classList.add('hidden');
+    document.getElementById('standings').classList.add('hidden');
+    document.getElementById('results').classList.add('hidden');
+    
+    // Show selected section
+    document.getElementById(category).classList.remove('hidden');
+    
+    // Update button active state
+    document.querySelectorAll('.category-tabs button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Load news if not already loaded
+    loadNews();
+}
+
+// Load news when page loads
+window.addEventListener('load', loadNews);
+loadNews();
