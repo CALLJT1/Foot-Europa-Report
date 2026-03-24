@@ -73,11 +73,10 @@ async function loadNews(){
             }
             html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
 
-            // Add Follow Your Club link under top story only
+            // Top story: image + title only (no link below)
             if(!topSet && img && section !== "ucl-news"){
                 topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
-                                         <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.5em; display:block; margin-top:5px;">${item.title}</a>
-                                         <a href="${item.link}" class="follow-club" target="_blank">Follow Your Club</a>`;
+                                         <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.5em; display:block; margin-top:5px;">${item.title}</a>`;
                 topSet = true;
             }
 
