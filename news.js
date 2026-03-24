@@ -56,14 +56,14 @@ async function loadNews(){
 
             let html = '';
             if(img){
-                html += `<a href="${item.link}" target="_blank"><img src="${img}" alt="" style="width:100%; height:auto;"></a>`;
+                html += `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>`;
             }
             html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
 
-            // Top story: show only image + title
+            // Top story: only image + title
             if(!topSet && img){
-                topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt="" style="width:100%; height:auto;"></a>
-                                         <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.5em; display:block; margin-top:5px;">${item.title}</a>`;
+                topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
+                                         <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.3em; display:block; margin-top:5px;">${item.title}</a>`;
                 topSet = true;
             }
 
