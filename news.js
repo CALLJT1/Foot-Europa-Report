@@ -27,6 +27,18 @@ function extractImageFromDescription(description) {
     return imgMatch ? imgMatch[1] : null;
 }
 
+function upgradeImageQuality(imageUrl) {
+    if (!imageUrl) return null;
+    
+    // Upgrade BBC images from low to high resolution
+    if (imageUrl.includes('ichef.bbci.co.uk')) {
+        // Replace /240/ with /976/ for high resolution
+        return imageUrl.replace(/\/240\//, '/976/');
+    }
+    
+    return imageUrl;
+}
+
 async function loadNews() {
     let topStorySet = false;
     for (const section in feeds) {
@@ -54,6 +66,9 @@ async function loadNews() {
                 } else if (item.description) {
                     imageUrl = extractImageFromDescription(item.description);
                 }
+                
+                // Upgrade image quality
+                imageUrl = upgradeImageQuality(imageUrl);
                 
                 // Build HTML
                 let html = '';
