@@ -83,5 +83,15 @@
 <footer>© 2026 Foot Europa Report | Live news from multiple sources</footer>
 
 <script src="news.js"></script>
+<script>
+    // Tab switcher
+    function showCategory(category) {
+        document.getElementById('news').classList.add('hidden');
+        document.getElementById('transfers').classList.add('hidden');
+        document.getElementById(category).classList.remove('hidden');
+        document.querySelectorAll('.category-tabs button').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.category-tabs button[onclick="showCategory('${category}')"]`).classList.add('active');
+    }
+</script>
 </body>
 </html>
