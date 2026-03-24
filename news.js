@@ -1,3 +1,5 @@
+// news.js
+
 const feeds = {
     // News Feeds
     "pl-news": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
@@ -56,14 +58,23 @@ async function loadNews(){
         items.slice(0,5).forEach(item=>{
             let img = item.enclosure?.link || item.thumbnail || item.image || extractImage(item.description);
             img = upgradeImage(img);
+
             const div = document.createElement('div');
-            div.className='headline';
-            div.innerHTML = img ? `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>` : `<a href="${item.link}" target="_blank">${item.title}</a>`;
+            div.className = 'headline';
+
+            let html = '';
+            if(img){
+                html += `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>`;
+            }
+            html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
+
+            div.innerHTML = html;
             container.appendChild(div);
 
             if(!topSet && img){
-                topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>`;
-                topSet=true;
+                topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
+                                         <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.5em; display:block; margin-top:5px;">${item.title}</a>`;
+                topSet = true;
             }
         });
     }
