@@ -1,9 +1,9 @@
 // news.js
 
 const feeds = {
-    "premier-league": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
-    "la-liga": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
-    "serie-a": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
+    "pl-news": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
+    "laliga-news": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
+    "seriea-news": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
     "other-leagues": "https://www.espn.com/espn/rss/soccer/news"
 };
 
@@ -29,84 +29,52 @@ function extractImageFromDescription(description) {
 
 function upgradeImageQuality(imageUrl) {
     if (!imageUrl) return null;
-    
-    // Upgrade BBC images from low to high resolution
+
+    // Upgrade BBC images
     if (imageUrl.includes('ichef.bbci.co.uk')) {
-        // Replace any resolution size with 1280 (highest available)
         imageUrl = imageUrl.replace(/\/\d+\//, '/1280/');
         return imageUrl;
     }
-    
+
     // Upgrade ESPN images
     if (imageUrl.includes('espn')) {
         return imageUrl.replace(/\?.*$/, '?w=1280');
     }
-    
-    return imageUrl;
-}
-    
-    // Upgrade BBC images from low to high resolution
-    if (imageUrl.includes('ichef.bbci.co.uk')) {
-        // Replace /240/ with /976/ for high resolution
-        return imageUrl.replace(/\/240\//, '/976/');
-    }
-    
+
     return imageUrl;
 }
 
 async function loadNews() {
     let topStorySet = false;
+
     for (const section in feeds) {
         const container = document.getElementById(section);
+        if (!container) continue;
+
         try {
             const items = await fetchRSS(feeds[section]);
             container.innerHTML = '';
-            
-            items.slice(0, 5).forEach((item, index) => {
+
+            if (items.length === 0) {
+                container.innerHTML = '<p style="color:#999;">No articles available</p>';
+                continue;
+            }
+
+            items.slice(0, 5).forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'headline';
                 div.style.marginBottom = '15px';
                 div.style.paddingBottom = '15px';
                 div.style.borderBottom = '1px solid #ddd';
-                
-                // Try multiple ways to get image
-                let imageUrl = null;
-                
-                if (item.enclosure && item.enclosure.link) {
-                    imageUrl = item.enclosure.link;
-                } else if (item.thumbnail) {
-                    imageUrl = item.thumbnail;
-                } else if (item.image) {
-                    imageUrl = item.image;
-                } else if (item.description) {
-                    imageUrl = extractImageFromDescription(item.description);
-                }
-                
-               function upgradeImageQuality(imageUrl) {
-    if (!imageUrl) return null;
-    
-    // Upgrade BBC images from low to high resolution
-    if (imageUrl.includes('ichef.bbci.co.uk')) {
-        // Replace any resolution size with 1280 (highest available)
-        imageUrl = imageUrl.replace(/\/\d+\//, '/1280/');
-        return imageUrl;
-    }
-    
-    // Upgrade ESPN images
-    if (imageUrl.includes('espn')) {
-        return imageUrl.replace(/\?.*$/, '?w=1280');
-    }
-    
-    return imageUrl;
-}
-                
-                // Build HTML
+
+                let imageUrl = item.enclosure?.link || item.thumbnail || item.image || extractImageFromDescription(item.description);
+                imageUrl = upgradeImageQuality(imageUrl);
+
                 let html = '';
-                
                 if (imageUrl) {
                     html += `<img src="${imageUrl}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:10px; border-radius:4px; object-fit:cover;" onerror="this.style.display='none'">`;
                 }
-                
+
                 html += `
                     <a href="${item.link}" target="_blank" style="font-weight:bold; text-decoration:none; color:#000; display:block;">
                         ${item.title}
@@ -115,10 +83,10 @@ async function loadNews() {
                         ${item.pubDate ? new Date(item.pubDate).toLocaleDateString() : 'Recent'}
                     </p>
                 `;
-                
+
                 div.innerHTML = html;
                 container.appendChild(div);
-                
+
                 // Set top story
                 if (!topStorySet && imageUrl) {
                     topStoryDiv.innerHTML = `
@@ -130,6 +98,7 @@ async function loadNews() {
                     topStorySet = true;
                 }
             });
+
         } catch (err) {
             container.innerHTML = '<p style="color:#cc0000;">Failed to load news</p>';
             console.error(`Error fetching ${section}:`, err);
@@ -137,6 +106,19 @@ async function loadNews() {
     }
 }
 
+// Show/hide category tabs
+function showCategory(category, event) {
+    ['news', 'transfers', 'standings', 'results'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+
+    const selected = document.getElementById(category);
+    if (selected) selected.classList.remove('hidden');
+
+    document.querySelectorAll('.category-tabs button').forEach(btn => btn.classList.remove('active'));
+    if (event) event.target.classList.add('active');
+}
+
 // Load news when page loads
 window.addEventListener('load', loadNews);
-loadNews();
