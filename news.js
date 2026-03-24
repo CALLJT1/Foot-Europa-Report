@@ -1,21 +1,10 @@
 // news.js
 
 const feeds = {
-    // News Feeds
-    "pl-news": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
-    "laliga-news": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
-    "seriea-news": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
-    "bundesliga-news": "https://www.bbc.co.uk/sport/football/german-bundesliga/rss.xml",
-    "ligue1-news": "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml",
-    "ucl-news": "https://www.bbc.co.uk/sport/football/european-cup/rss.xml",
-    
-    // Transfer Feeds
-    "transfer-news": "https://www.bbc.co.uk/sport/football/transfers/rss.xml",
-    "skysports-transfers": "https://www.skysports.com/transfer-news/rss.xml",
-    "espn-transfers": "https://www.espn.com/espn/rss/soccer/news",
-    
-    // Results & Fixtures
-    "results-info": "https://www.bbc.co.uk/sport/football/rss.xml"
+    "premier-league": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
+    "la-liga": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
+    "serie-a": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
+    "other-leagues": "https://www.espn.com/espn/rss/soccer/news"
 };
 
 const topStoryDiv = document.getElementById('top-story');
@@ -41,8 +30,9 @@ function extractImageFromDescription(description) {
 function upgradeImageQuality(imageUrl) {
     if (!imageUrl) return null;
     
-    // Upgrade BBC images
+    // Upgrade BBC images from low to high resolution
     if (imageUrl.includes('ichef.bbci.co.uk')) {
+        // Replace any resolution size with 1280 (highest available)
         imageUrl = imageUrl.replace(/\/\d+\//, '/1280/');
         return imageUrl;
     }
@@ -54,22 +44,23 @@ function upgradeImageQuality(imageUrl) {
     
     return imageUrl;
 }
+    
+    // Upgrade BBC images from low to high resolution
+    if (imageUrl.includes('ichef.bbci.co.uk')) {
+        // Replace /240/ with /976/ for high resolution
+        return imageUrl.replace(/\/240\//, '/976/');
+    }
+    
+    return imageUrl;
+}
 
 async function loadNews() {
     let topStorySet = false;
-    
     for (const section in feeds) {
         const container = document.getElementById(section);
-        if (!container) continue;
-        
         try {
             const items = await fetchRSS(feeds[section]);
             container.innerHTML = '';
-            
-            if (items.length === 0) {
-                container.innerHTML = '<p style="color:#999;">No articles available</p>';
-                continue;
-            }
             
             items.slice(0, 5).forEach((item, index) => {
                 const div = document.createElement('div');
@@ -78,7 +69,7 @@ async function loadNews() {
                 div.style.paddingBottom = '15px';
                 div.style.borderBottom = '1px solid #ddd';
                 
-                // Get image
+                // Try multiple ways to get image
                 let imageUrl = null;
                 
                 if (item.enclosure && item.enclosure.link) {
@@ -91,8 +82,23 @@ async function loadNews() {
                     imageUrl = extractImageFromDescription(item.description);
                 }
                 
-                // Upgrade image quality
-                imageUrl = upgradeImageQuality(imageUrl);
+               function upgradeImageQuality(imageUrl) {
+    if (!imageUrl) return null;
+    
+    // Upgrade BBC images from low to high resolution
+    if (imageUrl.includes('ichef.bbci.co.uk')) {
+        // Replace any resolution size with 1280 (highest available)
+        imageUrl = imageUrl.replace(/\/\d+\//, '/1280/');
+        return imageUrl;
+    }
+    
+    // Upgrade ESPN images
+    if (imageUrl.includes('espn')) {
+        return imageUrl.replace(/\?.*$/, '?w=1280');
+    }
+    
+    return imageUrl;
+}
                 
                 // Build HTML
                 let html = '';
@@ -125,59 +131,10 @@ async function loadNews() {
                 }
             });
         } catch (err) {
-            container.innerHTML = '<p style="color:#cc0000;">Failed to load articles</p>';
+            container.innerHTML = '<p style="color:#cc0000;">Failed to load news</p>';
             console.error(`Error fetching ${section}:`, err);
         }
     }
-    
-    // Load standings data
-    loadStandings();
-}
-
-async function loadStandings() {
-    const standingsDiv = document.getElementById('standings-info');
-    if (!standingsDiv) return;
-    
-    // Using a football API for standings (free tier)
-    const standings = [
-        { league: 'Premier League', leader: 'Manchester City', points: 89 },
-        { league: 'La Liga', leader: 'Real Madrid', points: 91 },
-        { league: 'Serie A', leader: 'Inter Milan', points: 88 },
-        { league: 'Bundesliga', leader: 'Bayern Munich', points: 84 },
-        { league: 'Ligue 1', leader: 'Paris Saint-Germain', points: 82 }
-    ];
-    
-    let html = '<table style="width:100%; border-collapse:collapse;">';
-    html += '<tr style="background:#000; color:#fff;"><th style="padding:10px; text-align:left;">League</th><th style="padding:10px; text-align:left;">Leader</th><th style="padding:10px; text-align:left;">Points</th></tr>';
-    
-    standings.forEach(s => {
-        html += `<tr style="border-bottom:1px solid #ddd;"><td style="padding:10px;">${s.league}</td><td style="padding:10px;">${s.leader}</td><td style="padding:10px;"><strong>${s.points}</strong></td></tr>`;
-    });
-    
-    html += '</table>';
-    html += '<p style="margin-top:15px; font-size:0.9em; color:#999;">For live standings, visit <a href="https://www.bbc.co.uk/sport/football/tables" target="_blank">BBC Sport Tables</a></p>';
-    
-    standingsDiv.innerHTML = html;
-}
-
-function showCategory(category) {
-    // Hide all sections
-    document.getElementById('news').classList.add('hidden');
-    document.getElementById('transfers').classList.add('hidden');
-    document.getElementById('standings').classList.add('hidden');
-    document.getElementById('results').classList.add('hidden');
-    
-    // Show selected section
-    document.getElementById(category).classList.remove('hidden');
-    
-    // Update button active state
-    document.querySelectorAll('.category-tabs button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    event.target.classList.add('active');
-    
-    // Load news if not already loaded
-    loadNews();
 }
 
 // Load news when page loads
