@@ -15,9 +15,9 @@ const feeds = {
 
 const topStoryDiv=document.getElementById("top-story");
 
-async function fetchRSS(feedUrl){
+async function fetchRSS(url){
 
-const api=`https://api.allorigins.win/get?url=${encodeURIComponent(feedUrl)}`;
+const api=`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
 
 try{
 
@@ -49,11 +49,29 @@ return[];
 
 function extractImage(description){
 
-if(!description)return null;
+if(!description) return null;
 
 const match=description.match(/<img[^>]+src="([^">]+)"/);
 
 return match?match[1]:null;
+
+}
+
+async function loadTicker(){
+
+const ticker=document.getElementById("ticker-content");
+
+const items=await fetchRSS("https://www.bbc.co.uk/sport/football/rss.xml");
+
+let headlines="";
+
+items.slice(0,10).forEach(item=>{
+
+headlines+=`<a href="${item.link}" target="_blank">${item.title}</a>`;
+
+});
+
+ticker.innerHTML=headlines;
 
 }
 
@@ -64,24 +82,15 @@ let topStorySet=false;
 for(const section in feeds){
 
 const container=document.getElementById(section);
-
-if(!container)continue;
+if(!container) continue;
 
 const items=await fetchRSS(feeds[section]);
 
 container.innerHTML="";
 
-if(items.length===0){
-
-container.innerHTML="<p>No articles available</p>";
-continue;
-
-}
-
 items.slice(0,5).forEach(item=>{
 
 const div=document.createElement("div");
-
 div.className="headline";
 
 let image=extractImage(item.description);
@@ -89,9 +98,7 @@ let image=extractImage(item.description);
 let html="";
 
 if(image){
-
 html+=`<img src="${image}" style="margin-bottom:8px">`;
-
 }
 
 html+=`
@@ -105,13 +112,8 @@ ${new Date(item.pubDate).toLocaleDateString()}
 </p>
 
 <p>
-<a href="${item.link}" target="_blank" style="
-background:#0066cc;
-color:#fff;
-padding:6px 12px;
-text-decoration:none;
-border-radius:4px;
-font-size:0.8em;">
+<a href="${item.link}" target="_blank"
+style="background:#0066cc;color:#fff;padding:6px 12px;text-decoration:none;border-radius:4px;font-size:0.8em;">
 Follow your club
 </a>
 </p>
@@ -126,19 +128,16 @@ if(!topStorySet && image){
 
 topStoryDiv.innerHTML=`
 
-<img src="${image}" style="width:50%;display:block;margin:0 auto 15px auto;border-radius:4px">
+<img src="${image}" style="width:50%;display:block;margin:0 auto 15px auto">
 
-<a href="${item.link}" target="_blank" style="font-size:1.5em;text-decoration:none;color:#000;font-weight:bold;">
+<a href="${item.link}" target="_blank"
+style="font-size:1.5em;text-decoration:none;color:#000;font-weight:bold;">
 ${item.title}
 </a>
 
 <p style="margin-top:10px;">
-<a href="${item.link}" target="_blank" style="
-background:#0066cc;
-color:#fff;
-padding:10px 20px;
-text-decoration:none;
-border-radius:4px;">
+<a href="${item.link}" target="_blank"
+style="background:#0066cc;color:#fff;padding:10px 20px;text-decoration:none;border-radius:4px;">
 Follow your club
 </a>
 </p>
@@ -170,4 +169,9 @@ event.target.classList.add("active");
 
 }
 
-window.addEventListener("load",loadNews);
+window.addEventListener("load",()=>{
+
+loadNews();
+loadTicker();
+
+});
