@@ -41,8 +41,8 @@ async function loadNews(){
         if(!container) continue;
 
         let items = await fetchRSS(feeds[section]);
-
         container.innerHTML = '';
+
         if(items.length === 0){
             container.innerHTML = '<p style="color:#999;">No articles available</p>';
             continue;
@@ -55,13 +55,14 @@ async function loadNews(){
             const div = document.createElement('div');
             div.className='headline';
 
+            // Only image + title, no description text
             let html = '';
             if(img){
                 html += `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>`;
             }
             html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
 
-            // Top story: only image + title
+            // Top story
             if(!topSet && img){
                 topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
                                          <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.3em; display:block; margin-top:5px;">${item.title}</a>`;
