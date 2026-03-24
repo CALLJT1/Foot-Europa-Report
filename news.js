@@ -12,10 +12,7 @@ const feeds = {
     // Transfer Feeds
     "transfer-news": "https://www.bbc.co.uk/sport/football/transfers/rss.xml",
     "skysports-transfers": "https://www.skysports.com/transfer-news/rss.xml",
-    "espn-transfers": "https://www.espn.com/espn/rss/soccer/news",
-    
-    // Results & Fixtures
-    "results-info": "https://www.bbc.co.uk/sport/football/rss.xml"
+    "espn-transfers": "https://www.espn.com/espn/rss/soccer/news"
 };
 
 const topStoryDiv = document.getElementById('top-story');
@@ -106,7 +103,7 @@ async function loadNews() {
                         ${item.title}
                     </a>
                     <p style="font-size:0.85em; color:#999; margin-top:5px; margin-bottom:0;">
-                        ${item.pubDate ? new Date(item.pubDate).toLocaleDateString() : 'Recent'}
+                        ${item.pubDate ? new Date(item.pubDate).toLocaleDateString() : 'Recent'} | <a href="${item.link}" target="_blank" style="color:#0066cc; text-decoration:none;">Follow your club</a>
                     </p>
                 `;
                 
@@ -120,6 +117,7 @@ async function loadNews() {
                         <a href="${item.link}" target="_blank" style="font-weight:bold; text-decoration:none; color:#000; font-size:1.5em;">
                             ${item.title}
                         </a>
+                        <p style="margin-top:10px;"><a href="${item.link}" target="_blank" style="background:#0066cc; color:#fff; padding:10px 20px; text-decoration:none; border-radius:4px; display:inline-block;">Follow your club</a></p>
                     `;
                     topStorySet = true;
                 }
@@ -129,43 +127,12 @@ async function loadNews() {
             console.error(`Error fetching ${section}:`, err);
         }
     }
-    
-    // Load standings data
-    loadStandings();
-}
-
-async function loadStandings() {
-    const standingsDiv = document.getElementById('standings-info');
-    if (!standingsDiv) return;
-    
-    // Using a football API for standings (free tier)
-    const standings = [
-        { league: 'Premier League', leader: 'Manchester City', points: 89 },
-        { league: 'La Liga', leader: 'Real Madrid', points: 91 },
-        { league: 'Serie A', leader: 'Inter Milan', points: 88 },
-        { league: 'Bundesliga', leader: 'Bayern Munich', points: 84 },
-        { league: 'Ligue 1', leader: 'Paris Saint-Germain', points: 82 }
-    ];
-    
-    let html = '<table style="width:100%; border-collapse:collapse;">';
-    html += '<tr style="background:#000; color:#fff;"><th style="padding:10px; text-align:left;">League</th><th style="padding:10px; text-align:left;">Leader</th><th style="padding:10px; text-align:left;">Points</th></tr>';
-    
-    standings.forEach(s => {
-        html += `<tr style="border-bottom:1px solid #ddd;"><td style="padding:10px;">${s.league}</td><td style="padding:10px;">${s.leader}</td><td style="padding:10px;"><strong>${s.points}</strong></td></tr>`;
-    });
-    
-    html += '</table>';
-    html += '<p style="margin-top:15px; font-size:0.9em; color:#999;">For live standings, visit <a href="https://www.bbc.co.uk/sport/football/tables" target="_blank">BBC Sport Tables</a></p>';
-    
-    standingsDiv.innerHTML = html;
 }
 
 function showCategory(category) {
     // Hide all sections
     document.getElementById('news').classList.add('hidden');
     document.getElementById('transfers').classList.add('hidden');
-    document.getElementById('standings').classList.add('hidden');
-    document.getElementById('results').classList.add('hidden');
     
     // Show selected section
     document.getElementById(category).classList.remove('hidden');
