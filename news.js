@@ -35,6 +35,7 @@ function upgradeImage(url){
 
 async function loadNews(){
     let topSet = false;
+
     for(const section in feeds){
         const container = document.getElementById(section);
         if(!container) continue;
