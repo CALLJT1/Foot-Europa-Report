@@ -1,7 +1,6 @@
 const feeds = {
     "pl-news": [
         "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
-        "https://www.skysports.com/premier-league-news/rss.xml",
         "https://www.espn.com/espn/rss/soccer/news?league=eng.1"
     ],
     "laliga-news": [
@@ -31,7 +30,7 @@ async function fetchRSS(url){
         const data = await res.json();
         return data.items || [];
     } catch(e){
-        console.error(e);
+        console.error("RSS fetch failed:", url, e);
         return [];
     }
 }
@@ -49,26 +48,25 @@ function upgradeImage(url){
     return url;
 }
 
-// Merge multiple feeds and sort by date descending
-async function fetchAllFeeds(feedArray){
-    let allItems = [];
-    for(const feed of feedArray){
+// Fetch all feeds for a league, merge, filter football, sort by date
+async function fetchLeagueArticles(feedArray){
+    const allArticles = [];
+
+    await Promise.all(feedArray.map(async (feed) => {
         const items = await fetchRSS(feed);
-        allItems = allItems.concat(items);
-    }
-    // Filter for football only: check if category or title contains soccer/football
-    allItems = allItems.filter(item=>{
-        const title = item.title.toLowerCase();
-        const categories = (item.categories || []).map(c=>c.toLowerCase());
-        return title.includes("football") || title.includes("soccer") || categories.includes("football") || categories.includes("soccer");
-    });
+        items.forEach(item => {
+            const title = item.title.toLowerCase();
+            const categories = (item.categories || []).map(c => c.toLowerCase());
+            if(title.includes("football") || title.includes("soccer") || categories.includes("football") || categories.includes("soccer")){
+                allArticles.push(item);
+            }
+        });
+    }));
+
     // Sort newest first
-    allItems.sort((a,b)=>{
-        const dateA = new Date(a.pubDate);
-        const dateB = new Date(b.pubDate);
-        return dateB - dateA;
-    });
-    return allItems.slice(0,5); // top 5
+    allArticles.sort((a,b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+    return allArticles.slice(0,5);
 }
 
 async function loadNews(){
@@ -79,14 +77,15 @@ async function loadNews(){
         if(!container) continue;
 
         container.innerHTML = '';
-        let items = await fetchAllFeeds(feeds[section]);
+
+        const items = await fetchLeagueArticles(feeds[section]);
 
         if(items.length === 0){
             container.innerHTML = '<p style="color:#999;">No articles available</p>';
             continue;
         }
 
-        items.forEach(item=>{
+        items.forEach(item => {
             let img = item.enclosure?.link || item.thumbnail || item.image || extractImage(item.description);
             img = upgradeImage(img);
 
@@ -99,7 +98,7 @@ async function loadNews(){
             }
             html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
 
-            // Top story
+            // Top story: first article with image
             if(!topSet && img){
                 topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
                                          <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.3em; display:block; margin-top:5px;">${item.title}</a>`;
