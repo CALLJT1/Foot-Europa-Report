@@ -1,48 +1,45 @@
 // news.js
 
-// Function to fetch RSS feeds from various soccer leagues
-async function fetchRSSFeeds() {
-    const leagues = {
-        "Premier League": "https://www.premierleague.com/en-gb/news/rss",
-        "La Liga": "https://www.laliga.com/en/feeds/news",
-        "Serie A": "https://www.legaseriea.it/en/rss",
-        // add more leagues as needed
-    };
-
-    const feedPromises = Object.keys(leagues).map(async (league) => {
-        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(leagues[league])}&api_key=YOUR_API_KEY`);
-        const data = await response.json();
-        return { league, articles: data.items };
-    });
-
-    return Promise.all(feedPromises);
-}
-
-// Function to dynamically populate HTML with fetched feeds
-function populateFeeds(feeds) {
-    const container = document.getElementById('rss-feeds');
-    container.innerHTML = ''; // Clear previous feeds
-
-    feeds.forEach(feed => {
-        const leagueSection = document.createElement('section');
-        leagueSection.innerHTML = `<h2>${feed.league}</h2>`;
-        
-        feed.articles.forEach(article => {
-            const articleLink = document.createElement('a');
-            articleLink.href = article.link;
-            articleLink.target = '_blank';
-            articleLink.innerText = article.title;
-
-            leagueSection.appendChild(articleLink);
-            leagueSection.appendChild(document.createElement('br'));
-        });
-
-        container.appendChild(leagueSection);
-    });
-}
-
-// Fetch and populate feeds on page load
-window.onload = async () => {
-    const feeds = await fetchRSSFeeds();
-    populateFeeds(feeds);
+const feeds = {
+    "premier-league": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
+    "la-liga": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
+    "serie-a": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
+    "other-leagues": "https://www.espn.com/espn/rss/soccer/news"
 };
+
+const topStoryDiv = document.getElementById('top-story');
+
+async function fetchRSS(feedUrl) {
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    return data.items;
+}
+
+async function loadNews() {
+    let topStorySet = false;
+    for (const section in feeds) {
+        const container = document.getElementById(section);
+        try {
+            const items = await fetchRSS(feeds[section]);
+            container.innerHTML = '';
+            items.slice(0, 5).forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'headline';
+                div.innerHTML = `<a href="${item.link}" target="_blank">${item.title}</a>`;
+                container.appendChild(div);
+                
+                if (!topStorySet) {
+                    topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank">${item.title}</a>`;
+                    topStorySet = true;
+                }
+            });
+        } catch (err) {
+            container.innerHTML = 'Failed to load news.';
+            console.error(`Error fetching ${section}:`, err);
+        }
+    }
+}
+
+// Load news on page load
+loadNews();
