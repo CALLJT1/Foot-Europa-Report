@@ -17,25 +17,10 @@ padding:0;
 header{
 background:#000;
 color:#fff;
-padding:15px;
+padding:20px;
 text-align:center;
 font-size:2em;
 font-weight:bold;
-}
-
-nav ul{
-list-style:none;
-padding:0;
-margin:10px 0 0 0;
-display:flex;
-justify-content:center;
-gap:20px;
-}
-
-nav a{
-color:#fff;
-text-decoration:none;
-font-size:0.5em;
 }
 
 main{
@@ -45,8 +30,7 @@ margin:20px auto;
 }
 
 .top-story{
-font-size:1.5em;
-font-weight:bold;
+text-align:center;
 margin-bottom:25px;
 }
 
@@ -129,16 +113,7 @@ border-radius:4px;
 <body>
 
 <header>
-⚽ Foot Europa Report
-
-<nav>
-<ul>
-<li><a href="#">Home</a></li>
-<li><a href="#">Europe</a></li>
-<li><a href="#">Transfers</a></li>
-</ul>
-</nav>
-
+Foot Europa Report
 </header>
 
 <main>
@@ -148,11 +123,9 @@ Loading top story...
 </div>
 
 <div class="category-tabs">
-<button class="active" onclick="showCategory('news',event)">📰 News</button>
-<button onclick="showCategory('transfers',event)">🔄 Transfers</button>
+<button class="active" onclick="showCategory('news',event)">News</button>
+<button onclick="showCategory('transfers',event)">Transfers</button>
 </div>
-
-<!-- NEWS -->
 
 <div id="news" class="news-section">
 
@@ -187,8 +160,6 @@ Loading top story...
 </div>
 
 </div>
-
-<!-- TRANSFERS -->
 
 <div id="transfers" class="news-section hidden">
 
