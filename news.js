@@ -32,7 +32,7 @@ async function loadNews() {
                 if (item.enclosure && item.enclosure.link) {
                     imageHtml = `<img src="${item.enclosure.link}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:8px; border-radius:4px;">`;
                 } else if (item.thumbnail) {
-                    imageHtml = `<img src="${item.thumbnail}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:8px; border-radius:4px;">
+                    imageHtml = `<img src="${item.thumbnail}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:8px; border-radius:4px;">`;
                 } else if (item.description && item.description.includes('<img')) {
                     const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
                     if (imgMatch) {
