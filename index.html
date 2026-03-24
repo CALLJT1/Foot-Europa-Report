@@ -3,11 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>www.Foot-Europa-Report.com</title>
+    <title>Foot Europa Report</title>
+    <style>
+        body { font-family: Arial, Helvetica, sans-serif; background: #f4f4f4; margin:0; padding:0; }
+        header { background:#000; color:#fff; padding:10px 20px; text-align:center; font-size:2em; font-weight:bold;}
+        main { width:90%; max-width:1000px; margin:20px auto; }
+        .top-story { font-size:1.8em; font-weight:bold; margin-bottom:15px; }
+        .news-section { display:flex; flex-wrap:wrap; gap:20px; }
+        .column { flex:1; min-width:200px; }
+        .headline { font-size:1.1em; margin:8px 0; }
+        .headline a { color:#000; text-decoration:none; }
+        .headline a:hover { text-decoration:underline; }
+        footer { text-align:center; margin:40px 0; font-size:0.9em; color:#555; }
+    </style>
 </head>
 <body>
-    <h1>Welcome to Foot Europa Report</h1>
-    <p>This is a football website that provides the latest news and updates.</p>
-    <p>In case you are looking for soccer news, we cover that too, but we prefer the term football.</p>
+
+<header>Foot Europa Report</header>
+
+<main>
+    <div id="top-story" class="top-story">Loading top story...</div>
+
+    <div class="news-section">
+        <div class="column">
+            <h3>Premier League</h3>
+            <div id="premier-league">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>La Liga</h3>
+            <div id="la-liga">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>Serie A</h3>
+            <div id="serie-a">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>Other Leagues</h3>
+            <div id="other-leagues">Loading...</div>
+        </div>
+    </div>
+</main>
+
+<footer>© 2026 Foot Europa Report | Live news from RSS feeds</footer>
+
+<script src="news.js"></script>
 </body>
 </html>
