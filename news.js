@@ -1,14 +1,23 @@
 // news.js
 
 const feeds = {
+    // News Feeds
     "pl-news": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
     "laliga-news": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
     "seriea-news": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
-    "other-leagues": "https://www.espn.com/espn/rss/soccer/news"
+    "bundesliga-news": "https://www.bbc.co.uk/sport/football/german-bundesliga/rss.xml",
+    "ligue1-news": "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml",
+    "ucl-news": "https://www.bbc.co.uk/sport/football/european-cup/rss.xml",
+
+    // Transfer Feeds
+    "transfer-news": "https://www.bbc.co.uk/sport/football/transfers/rss.xml",
+    "skysports-transfers": "https://www.skysports.com/transfer-news/rss.xml",
+    "espn-transfers": "https://www.espn.com/espn/rss/soccer/news"
 };
 
 const topStoryDiv = document.getElementById('top-story');
 
+// Fetch RSS and convert to JSON
 async function fetchRSS(feedUrl) {
     const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
     try {
@@ -21,19 +30,20 @@ async function fetchRSS(feedUrl) {
     }
 }
 
+// Extract image from HTML description
 function extractImageFromDescription(description) {
     if (!description) return null;
     const imgMatch = description.match(/<img[^>]+src="([^">]+)"/);
     return imgMatch ? imgMatch[1] : null;
 }
 
+// Upgrade image resolution
 function upgradeImageQuality(imageUrl) {
     if (!imageUrl) return null;
 
     // Upgrade BBC images
     if (imageUrl.includes('ichef.bbci.co.uk')) {
-        imageUrl = imageUrl.replace(/\/\d+\//, '/1280/');
-        return imageUrl;
+        return imageUrl.replace(/\/\d+\//, '/1280/');
     }
 
     // Upgrade ESPN images
@@ -44,6 +54,7 @@ function upgradeImageQuality(imageUrl) {
     return imageUrl;
 }
 
+// Load news and populate sections
 async function loadNews() {
     let topStorySet = false;
 
@@ -67,9 +78,11 @@ async function loadNews() {
                 div.style.paddingBottom = '15px';
                 div.style.borderBottom = '1px solid #ddd';
 
+                // Get image from multiple possible sources
                 let imageUrl = item.enclosure?.link || item.thumbnail || item.image || extractImageFromDescription(item.description);
                 imageUrl = upgradeImageQuality(imageUrl);
 
+                // Build HTML
                 let html = '';
                 if (imageUrl) {
                     html += `<img src="${imageUrl}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:10px; border-radius:4px; object-fit:cover;" onerror="this.style.display='none'">`;
@@ -87,7 +100,7 @@ async function loadNews() {
                 div.innerHTML = html;
                 container.appendChild(div);
 
-                // Set top story
+                // Set top story only once
                 if (!topStorySet && imageUrl) {
                     topStoryDiv.innerHTML = `
                         <img src="${imageUrl}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:15px; border-radius:4px; object-fit:cover;" onerror="this.style.display='none'">
@@ -100,25 +113,11 @@ async function loadNews() {
             });
 
         } catch (err) {
-            container.innerHTML = '<p style="color:#cc0000;">Failed to load news</p>';
+            container.innerHTML = '<p style="color:#cc0000;">Failed to load articles</p>';
             console.error(`Error fetching ${section}:`, err);
         }
     }
 }
 
-// Show/hide category tabs
-function showCategory(category, event) {
-    ['news', 'transfers', 'standings', 'results'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-    });
-
-    const selected = document.getElementById(category);
-    if (selected) selected.classList.remove('hidden');
-
-    document.querySelectorAll('.category-tabs button').forEach(btn => btn.classList.remove('active'));
-    if (event) event.target.classList.add('active');
-}
-
-// Load news when page loads
+// Load news on page load
 window.addEventListener('load', loadNews);
