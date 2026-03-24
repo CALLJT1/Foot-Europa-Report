@@ -1,222 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Foot Europa Report</title>
-
-<style>
-
-body{
-font-family:Arial, Helvetica, sans-serif;
-background:#f4f4f4;
-margin:0;
-padding:0;
-}
-
-header{
-background:#000;
-color:#fff;
-padding:20px;
-text-align:center;
-font-size:2em;
-font-weight:bold;
-}
-
-.ticker-container{
-display:flex;
-align-items:center;
-background:#111;
-color:white;
-overflow:hidden;
-}
-
-.ticker-label{
-background:#cc0000;
-padding:10px 15px;
-font-weight:bold;
-}
-
-.ticker{
-flex:1;
-overflow:hidden;
-white-space:nowrap;
-}
-
-#ticker-content{
-display:inline-block;
-padding-left:100%;
-animation:ticker-scroll 40s linear infinite;
-}
-
-#ticker-content a{
-color:white;
-text-decoration:none;
-margin-right:50px;
-}
-
-@keyframes ticker-scroll{
-0%{transform:translateX(0);}
-100%{transform:translateX(-100%);}
-}
-
-main{
-width:90%;
-max-width:1200px;
-margin:20px auto;
-}
-
-.top-story{
-text-align:center;
-margin-bottom:30px;
-}
-
-.category-tabs{
-display:flex;
-gap:10px;
-margin-bottom:20px;
-}
-
-.category-tabs button{
-padding:10px 20px;
-background:#000;
-color:#fff;
-border:none;
-cursor:pointer;
-border-radius:4px;
-}
-
-.category-tabs button.active{
-background:#0066cc;
-}
-
-.news-section{
-display:flex;
-flex-wrap:wrap;
-gap:20px;
-}
-
-.column{
-flex:1;
-min-width:250px;
-}
-
-.column h3{
-background:#000;
-color:#fff;
-padding:10px;
-margin:0 0 10px 0;
-border-radius:4px;
-}
-
-.headline{
-margin-bottom:15px;
-}
-
-.hidden{
-display:none;
-}
-
-footer{
-text-align:center;
-margin:40px 0;
-font-size:0.9em;
-color:#555;
-}
-
-img{
-max-width:100%;
-border-radius:4px;
-}
-
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foot Europa Report</title>
+    <style>
+        body { font-family: Arial, Helvetica, sans-serif; background: #f4f4f4; margin:0; padding:0; }
+        header { background:#000; color:#fff; padding:10px 20px; text-align:center; font-size:2em; font-weight:bold;}
+        main { width:90%; max-width:1200px; margin:20px auto; }
+        .top-story { font-size:1.8em; font-weight:bold; margin-bottom:20px; }
+        .category-tabs { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+        .category-tabs button { padding:10px 20px; background:#000; color:#fff; border:none; cursor:pointer; border-radius:4px; }
+        .category-tabs button.active { background:#0066cc; }
+        .category-tabs button:hover { background:#333; }
+        .news-section { display:flex; flex-wrap:wrap; gap:20px; }
+        .column { flex:1; min-width:250px; }
+        .column h3 { background:#000; color:#fff; padding:10px; margin:0 0 10px 0; border-radius:4px; }
+        .headline { font-size:1.1em; margin:8px 0; }
+        .headline a { color:#000; text-decoration:none; }
+        .headline a:hover { text-decoration:underline; }
+        footer { text-align:center; margin:40px 0; font-size:0.9em; color:#555; }
+        .hidden { display:none; }
+    </style>
 </head>
-
 <body>
 
-<header>
-Foot Europa Report
-</header>
-
-<div class="ticker-container">
-<div class="ticker-label">BREAKING</div>
-<div class="ticker">
-<div id="ticker-content">Loading headlines...</div>
-</div>
-</div>
+<header>⚽ Foot Europa Report</header>
 
 <main>
+    <div id="top-story" class="top-story">Loading top story...</div>
 
-<div id="top-story" class="top-story">
-Loading top story...
-</div>
+    <div class="category-tabs">
+        <button class="active" onclick="showCategory('news')">📰 News</button>
+        <button onclick="showCategory('transfers')">🔄 Transfers</button>
+    </div>
 
-<div class="category-tabs">
-<button class="active" onclick="showCategory('news',event)">News</button>
-<button onclick="showCategory('transfers',event)">Transfers</button>
-</div>
+    <!-- News Section -->
+    <div id="news" class="news-section">
+        <div class="column">
+            <h3>Premier League</h3>
+            <div id="pl-news">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>La Liga</h3>
+            <div id="laliga-news">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>Serie A</h3>
+            <div id="seriea-news">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>Bundesliga</h3>
+            <div id="bundesliga-news">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>Ligue 1</h3>
+            <div id="ligue1-news">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>UEFA Champions League</h3>
+            <div id="ucl-news">Loading...</div>
+        </div>
+    </div>
 
-<div id="news" class="news-section">
-
-<div class="column">
-<h3>Premier League</h3>
-<div id="pl-news">Loading...</div>
-</div>
-
-<div class="column">
-<h3>La Liga</h3>
-<div id="laliga-news">Loading...</div>
-</div>
-
-<div class="column">
-<h3>Serie A</h3>
-<div id="seriea-news">Loading...</div>
-</div>
-
-<div class="column">
-<h3>Bundesliga</h3>
-<div id="bundesliga-news">Loading...</div>
-</div>
-
-<div class="column">
-<h3>Ligue 1</h3>
-<div id="ligue1-news">Loading...</div>
-</div>
-
-<div class="column">
-<h3>Champions League</h3>
-<div id="ucl-news">Loading...</div>
-</div>
-
-</div>
-
-<div id="transfers" class="news-section hidden">
-
-<div class="column">
-<h3>BBC Transfers</h3>
-<div id="transfer-news">Loading...</div>
-</div>
-
-<div class="column">
-<h3>Sky Sports</h3>
-<div id="skysports-transfers">Loading...</div>
-</div>
-
-<div class="column">
-<h3>ESPN Transfers</h3>
-<div id="espn-transfers">Loading...</div>
-</div>
-
-</div>
-
+    <!-- Transfers Section -->
+    <div id="transfers" class="news-section hidden">
+        <div class="column">
+            <h3>Transfer News</h3>
+            <div id="transfer-news">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>Sky Sports Transfers</h3>
+            <div id="skysports-transfers">Loading...</div>
+        </div>
+        <div class="column">
+            <h3>ESPN Transfers</h3>
+            <div id="espn-transfers">Loading...</div>
+        </div>
+    </div>
 </main>
 
-<footer>
-© 2026 Foot Europa Report
-</footer>
+<footer>© 2026 Foot Europa Report | Live news from multiple sources</footer>
 
 <script src="news.js"></script>
-
 </body>
 </html>
