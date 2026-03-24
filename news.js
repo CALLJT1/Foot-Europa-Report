@@ -15,24 +15,24 @@ const feeds = {
 
 const topStoryDiv=document.getElementById("top-story");
 
+
 async function fetchRSS(url){
 
-const api=`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+const api=`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
 
 try{
 
 const response=await fetch(api);
-const data=await response.json();
+const text=await response.text();
 
 const parser=new DOMParser();
-const xml=parser.parseFromString(data.contents,"text/xml");
+const xml=parser.parseFromString(text,"text/xml");
 
 const items=[...xml.querySelectorAll("item")].map(item=>({
 
 title:item.querySelector("title")?.textContent,
 link:item.querySelector("link")?.textContent,
-pubDate:item.querySelector("pubDate")?.textContent,
-description:item.querySelector("description")?.textContent
+pubDate:item.querySelector("pubDate")?.textContent
 
 }));
 
@@ -47,21 +47,48 @@ return[];
 
 }
 
-function extractImage(description){
 
-if(!description) return null;
+async function fetchArticleImage(articleUrl){
 
-const match=description.match(/<img[^>]+src="([^">]+)"/);
+try{
 
-return match?match[1]:null;
+const proxy=`https://api.allorigins.win/raw?url=${encodeURIComponent(articleUrl)}`;
+
+const response=await fetch(proxy);
+
+const html=await response.text();
+
+const match=html.match(/<meta property="og:image" content="([^"]+)"/);
+
+if(match){
+
+return match[1];
 
 }
+
+return null;
+
+}catch(err){
+
+return null;
+
+}
+
+}
+
 
 async function loadTicker(){
 
 const ticker=document.getElementById("ticker-content");
 
 const items=await fetchRSS("https://www.bbc.co.uk/sport/football/rss.xml");
+
+if(!items || items.length===0){
+
+ticker.innerHTML="Latest football news";
+return;
+
+}
 
 let headlines="";
 
@@ -75,6 +102,7 @@ ticker.innerHTML=headlines;
 
 }
 
+
 async function loadNews(){
 
 let topStorySet=false;
@@ -82,23 +110,31 @@ let topStorySet=false;
 for(const section in feeds){
 
 const container=document.getElementById(section);
-if(!container) continue;
+
+if(!container)continue;
 
 const items=await fetchRSS(feeds[section]);
 
 container.innerHTML="";
 
-items.slice(0,5).forEach(item=>{
+for(let i=0;i<5;i++){
+
+const item=items[i];
+
+if(!item) continue;
 
 const div=document.createElement("div");
+
 div.className="headline";
 
-let image=extractImage(item.description);
+const image=await fetchArticleImage(item.link);
 
 let html="";
 
 if(image){
+
 html+=`<img src="${image}" style="margin-bottom:8px">`;
+
 }
 
 html+=`
@@ -109,13 +145,6 @@ ${item.title}
 
 <p style="font-size:0.8em;color:#999">
 ${new Date(item.pubDate).toLocaleDateString()}
-</p>
-
-<p>
-<a href="${item.link}" target="_blank"
-style="background:#0066cc;color:#fff;padding:6px 12px;text-decoration:none;border-radius:4px;font-size:0.8em;">
-Follow your club
-</a>
 </p>
 
 `;
@@ -135,24 +164,18 @@ style="font-size:1.5em;text-decoration:none;color:#000;font-weight:bold;">
 ${item.title}
 </a>
 
-<p style="margin-top:10px;">
-<a href="${item.link}" target="_blank"
-style="background:#0066cc;color:#fff;padding:10px 20px;text-decoration:none;border-radius:4px;">
-Follow your club
-</a>
-</p>
-
 `;
 
 topStorySet=true;
 
 }
 
-});
-
 }
 
 }
+
+}
+
 
 function showCategory(category,event){
 
@@ -168,6 +191,7 @@ btn.classList.remove("active");
 event.target.classList.add("active");
 
 }
+
 
 window.addEventListener("load",()=>{
 
