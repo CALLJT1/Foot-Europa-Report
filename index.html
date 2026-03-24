@@ -1,95 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foot Europa Report</title>
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background: #000;
-            color: #fff;
-            padding: 15px 20px;
-            text-align: center;
-            font-size: 2em;
-            font-weight: bold;
-        }
-        main {
-            width: 90%;
-            max-width: 1200px;
-            margin: 20px auto;
-        }
-        .top-story {
-            text-align: center;
-            font-size: 1.8em;
-            font-weight: bold;
-            margin-bottom: 30px;
-        }
-        .category-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .category-tabs button {
-            padding: 10px 20px;
-            background: #000;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background 0.3s;
-        }
-        .category-tabs button.active {
-            background: #0066cc;
-        }
-        .category-tabs button:hover {
-            background: #333;
-        }
-        .news-section {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
-        .column {
-            flex: 1;
-            min-width: 250px;
-        }
-        .column h3 {
-            background: #000;
-            color: #fff;
-            padding: 10px;
-            margin: 0 0 10px 0;
-            border-radius: 4px;
-            text-align: center;
-        }
-        .headline {
-            font-size: 1.1em;
-            margin: 8px 0;
-        }
-        .headline a {
-            color: #000;
-            text-decoration: none;
-        }
-        .headline a:hover {
-            text-decoration: underline;
-        }
-        footer {
-            text-align: center;
-            margin: 40px 0;
-            font-size: 0.9em;
-            color: #555;
-        }
-        .hidden { display: none; }
-        img { max-width: 100%; height: auto; border-radius: 4px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Foot Europa Report</title>
+<style>
+    body { font-family: Arial, Helvetica, sans-serif; background: #f4f4f4; margin:0; padding:0; }
+    header { background:#000; color:#fff; padding:15px 20px; text-align:center; font-size:2em; font-weight:bold; }
+    main { width:90%; max-width:1200px; margin:20px auto; }
+    .top-story { text-align:center; font-size:1.8em; font-weight:bold; margin-bottom:30px; }
+    .category-tabs { display:flex; gap:10px; margin-bottom:20px; justify-content:center; }
+    .category-tabs button { padding:10px 20px; background:#000; color:#fff; border:none; cursor:pointer; border-radius:4px; transition: background 0.3s; }
+    .category-tabs button.active { background:#0066cc; }
+    .category-tabs button:hover { background:#333; }
+    .news-section { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
+    .column { flex:1; min-width:250px; }
+    .headline { margin:8px 0; }
+    .headline a { text-decoration:none; color:#000; display:block; }
+    .headline a:hover { text-decoration:underline; }
+    footer { text-align:center; margin:40px 0; font-size:0.9em; color:#555; }
+    .hidden { display:none; }
+    img { max-width:100%; border-radius:4px; display:block; margin-bottom:10px; object-fit:cover; }
+</style>
 </head>
 <body>
 
@@ -103,68 +35,23 @@
     <div class="category-tabs">
         <button class="active" onclick="showCategory('news', event)">📰 News</button>
         <button onclick="showCategory('transfers', event)">🔄 Transfers</button>
-        <button onclick="showCategory('standings', event)">📊 Standings</button>
-        <button onclick="showCategory('results', event)">🎯 Results & Fixtures</button>
     </div>
 
     <!-- News Section -->
     <div id="news" class="news-section">
-        <div class="column">
-            <h3>Premier League</h3>
-            <div id="pl-news">Loading...</div>
-        </div>
-        <div class="column">
-            <h3>La Liga</h3>
-            <div id="laliga-news">Loading...</div>
-        </div>
-        <div class="column">
-            <h3>Serie A</h3>
-            <div id="seriea-news">Loading...</div>
-        </div>
-        <div class="column">
-            <h3>Bundesliga</h3>
-            <div id="bundesliga-news">Loading...</div>
-        </div>
-        <div class="column">
-            <h3>Ligue 1</h3>
-            <div id="ligue1-news">Loading...</div>
-        </div>
-        <div class="column">
-            <h3>UEFA Champions League</h3>
-            <div id="ucl-news">Loading...</div>
-        </div>
+        <div class="column"><div id="pl-news"></div></div>
+        <div class="column"><div id="laliga-news"></div></div>
+        <div class="column"><div id="seriea-news"></div></div>
+        <div class="column"><div id="bundesliga-news"></div></div>
+        <div class="column"><div id="ligue1-news"></div></div>
+        <div class="column"><div id="ucl-news"></div></div>
     </div>
 
     <!-- Transfers Section -->
     <div id="transfers" class="news-section hidden">
-        <div class="column">
-            <h3>Transfer News</h3>
-            <div id="transfer-news">Loading...</div>
-        </div>
-        <div class="column">
-            <h3>Sky Sports Transfers</h3>
-            <div id="skysports-transfers">Loading...</div>
-        </div>
-        <div class="column">
-            <h3>ESPN Transfers</h3>
-            <div id="espn-transfers">Loading...</div>
-        </div>
-    </div>
-
-    <!-- Standings Section -->
-    <div id="standings" class="news-section hidden">
-        <div class="column">
-            <h3>League Tables</h3>
-            <div id="standings-info">Loading standings data...</div>
-        </div>
-    </div>
-
-    <!-- Results & Fixtures Section -->
-    <div id="results" class="news-section hidden">
-        <div class="column">
-            <h3>Match Results & Fixtures</h3>
-            <div id="results-info">Loading results and fixtures...</div>
-        </div>
+        <div class="column" id="transfer-news"></div>
+        <div class="column" id="skysports-transfers"></div>
+        <div class="column" id="espn-transfers"></div>
     </div>
 </main>
 
@@ -172,18 +59,12 @@
 
 <script src="news.js"></script>
 <script>
-    // Show/hide category function
-    function showCategory(category, event) {
-        ['news', 'transfers', 'standings', 'results'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.classList.add('hidden');
-        });
-        const selected = document.getElementById(category);
-        if (selected) selected.classList.remove('hidden');
-
-        document.querySelectorAll('.category-tabs button').forEach(btn => btn.classList.remove('active'));
-        if (event) event.target.classList.add('active');
-    }
+function showCategory(category, event){
+    ['news','transfers'].forEach(id=>{document.getElementById(id).classList.add('hidden');});
+    document.getElementById(category).classList.remove('hidden');
+    document.querySelectorAll('.category-tabs button').forEach(btn=>btn.classList.remove('active'));
+    if(event) event.target.classList.add('active');
+}
 </script>
 
 </body>
