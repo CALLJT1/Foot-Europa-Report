@@ -1,5 +1,3 @@
-// news.js
-
 const feeds = {
     // News Feeds
     "pl-news": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
@@ -60,7 +58,7 @@ async function loadNews(){
             img = upgradeImage(img);
 
             const div = document.createElement('div');
-            div.className = 'headline';
+            div.className='headline';
 
             let html = '';
             if(img){
@@ -71,6 +69,7 @@ async function loadNews(){
             div.innerHTML = html;
             container.appendChild(div);
 
+            // Set top story only once
             if(!topSet && img){
                 topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
                                          <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.5em; display:block; margin-top:5px;">${item.title}</a>`;
