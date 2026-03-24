@@ -1,10 +1,18 @@
 // news.js
 
 const feeds = {
-    "premier-league": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
-    "la-liga": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
-    "serie-a": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
-    "other-leagues": "https://www.espn.com/espn/rss/soccer/news"
+    // News Feeds
+    "pl-news": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
+    "laliga-news": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
+    "seriea-news": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
+    "bundesliga-news": "https://www.bbc.co.uk/sport/football/german-bundesliga/rss.xml",
+    "ligue1-news": "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml",
+    "ucl-news": "https://www.bbc.co.uk/sport/football/european-cup/rss.xml",
+    
+    // Transfer Feeds
+    "transfer-news": "https://www.bbc.co.uk/sport/football/transfers/rss.xml",
+    "skysports-transfers": "https://www.skysports.com/transfer-news/rss.xml",
+    "espn-transfers": "https://www.espn.com/espn/rss/soccer/news"
 };
 
 const topStoryDiv = document.getElementById('top-story');
@@ -30,9 +38,8 @@ function extractImageFromDescription(description) {
 function upgradeImageQuality(imageUrl) {
     if (!imageUrl) return null;
     
-    // Upgrade BBC images from low to high resolution
+    // Upgrade BBC images
     if (imageUrl.includes('ichef.bbci.co.uk')) {
-        // Replace any resolution size with 1280 (highest available)
         imageUrl = imageUrl.replace(/\/\d+\//, '/1280/');
         return imageUrl;
     }
@@ -44,23 +51,22 @@ function upgradeImageQuality(imageUrl) {
     
     return imageUrl;
 }
-    
-    // Upgrade BBC images from low to high resolution
-    if (imageUrl.includes('ichef.bbci.co.uk')) {
-        // Replace /240/ with /976/ for high resolution
-        return imageUrl.replace(/\/240\//, '/976/');
-    }
-    
-    return imageUrl;
-}
 
 async function loadNews() {
     let topStorySet = false;
+    
     for (const section in feeds) {
         const container = document.getElementById(section);
+        if (!container) continue;
+        
         try {
             const items = await fetchRSS(feeds[section]);
             container.innerHTML = '';
+            
+            if (items.length === 0) {
+                container.innerHTML = '<p style="color:#999;">No articles available</p>';
+                continue;
+            }
             
             items.slice(0, 5).forEach((item, index) => {
                 const div = document.createElement('div');
@@ -69,7 +75,7 @@ async function loadNews() {
                 div.style.paddingBottom = '15px';
                 div.style.borderBottom = '1px solid #ddd';
                 
-                // Try multiple ways to get image
+                // Get image
                 let imageUrl = null;
                 
                 if (item.enclosure && item.enclosure.link) {
@@ -82,23 +88,8 @@ async function loadNews() {
                     imageUrl = extractImageFromDescription(item.description);
                 }
                 
-               function upgradeImageQuality(imageUrl) {
-    if (!imageUrl) return null;
-    
-    // Upgrade BBC images from low to high resolution
-    if (imageUrl.includes('ichef.bbci.co.uk')) {
-        // Replace any resolution size with 1280 (highest available)
-        imageUrl = imageUrl.replace(/\/\d+\//, '/1280/');
-        return imageUrl;
-    }
-    
-    // Upgrade ESPN images
-    if (imageUrl.includes('espn')) {
-        return imageUrl.replace(/\?.*$/, '?w=1280');
-    }
-    
-    return imageUrl;
-}
+                // Upgrade image quality
+                imageUrl = upgradeImageQuality(imageUrl);
                 
                 // Build HTML
                 let html = '';
@@ -131,10 +122,30 @@ async function loadNews() {
                 }
             });
         } catch (err) {
-            container.innerHTML = '<p style="color:#cc0000;">Failed to load news</p>';
+            container.innerHTML = '<p style="color:#cc0000;">Failed to load articles</p>';
             console.error(`Error fetching ${section}:`, err);
         }
     }
+}
+
+function showCategory(category) {
+    // Hide all sections
+    document.getElementById('news').classList.add('hidden');
+    document.getElementById('transfers').classList.add('hidden');
+    document.getElementById('standings').classList.add('hidden');
+    document.getElementById('results').classList.add('hidden');
+    
+    // Show selected section
+    document.getElementById(category).classList.remove('hidden');
+    
+    // Update button active state
+    document.querySelectorAll('.category-tabs button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Load news if not already loaded
+    loadNews();
 }
 
 // Load news when page loads
