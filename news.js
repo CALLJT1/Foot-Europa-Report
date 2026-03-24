@@ -32,6 +32,21 @@ function upgradeImageQuality(imageUrl) {
     
     // Upgrade BBC images from low to high resolution
     if (imageUrl.includes('ichef.bbci.co.uk')) {
+        // Replace any resolution size with 1280 (highest available)
+        imageUrl = imageUrl.replace(/\/\d+\//, '/1280/');
+        return imageUrl;
+    }
+    
+    // Upgrade ESPN images
+    if (imageUrl.includes('espn')) {
+        return imageUrl.replace(/\?.*$/, '?w=1280');
+    }
+    
+    return imageUrl;
+}
+    
+    // Upgrade BBC images from low to high resolution
+    if (imageUrl.includes('ichef.bbci.co.uk')) {
         // Replace /240/ with /976/ for high resolution
         return imageUrl.replace(/\/240\//, '/976/');
     }
@@ -67,8 +82,23 @@ async function loadNews() {
                     imageUrl = extractImageFromDescription(item.description);
                 }
                 
-                // Upgrade image quality
-                imageUrl = upgradeImageQuality(imageUrl);
+               function upgradeImageQuality(imageUrl) {
+    if (!imageUrl) return null;
+    
+    // Upgrade BBC images from low to high resolution
+    if (imageUrl.includes('ichef.bbci.co.uk')) {
+        // Replace any resolution size with 1280 (highest available)
+        imageUrl = imageUrl.replace(/\/\d+\//, '/1280/');
+        return imageUrl;
+    }
+    
+    // Upgrade ESPN images
+    if (imageUrl.includes('espn')) {
+        return imageUrl.replace(/\?.*$/, '?w=1280');
+    }
+    
+    return imageUrl;
+}
                 
                 // Build HTML
                 let html = '';
