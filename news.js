@@ -1,4 +1,4 @@
-const feeds = {
+onst feeds = {
 
 "pl-news":"https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
 "laliga-news":"https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
@@ -62,7 +62,6 @@ let topStorySet=false;
 for(const section in feeds){
 
 const container=document.getElementById(section);
-
 if(!container)continue;
 
 const items=await fetchRSS(feeds[section]);
@@ -105,23 +104,43 @@ ${item.title}
 ${new Date(item.pubDate).toLocaleDateString()}
 </p>
 
+<p>
+<a href="${item.link}" target="_blank" style="
+background:#0066cc;
+color:#fff;
+padding:6px 12px;
+text-decoration:none;
+border-radius:4px;
+font-size:0.8em;">
+Follow your club
+</a>
+</p>
+
 `;
 
 div.innerHTML=html;
-
 container.appendChild(div);
 
 if(!topStorySet && image){
 
 topStoryDiv.innerHTML=`
 
-<img src="${image}" style="width:50%;margin-bottom:15px;border-radius:4px">
+<img src="${image}" style="width:50%;display:block;margin:0 auto 15px auto;border-radius:4px">
 
-<br>
-
-<a href="${item.link}" target="_blank" style="font-size:1.4em;text-decoration:none;color:#000;font-weight:bold;">
+<a href="${item.link}" target="_blank" style="font-size:1.5em;text-decoration:none;color:#000;font-weight:bold;">
 ${item.title}
 </a>
+
+<p style="margin-top:10px;">
+<a href="${item.link}" target="_blank" style="
+background:#0066cc;
+color:#fff;
+padding:10px 20px;
+text-decoration:none;
+border-radius:4px;">
+Follow your club
+</a>
+</p>
 
 `;
 
