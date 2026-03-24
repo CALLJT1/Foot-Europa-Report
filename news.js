@@ -1,152 +1,161 @@
-// news.js
-
 const feeds = {
-    // News Feeds
-    "pl-news": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
-    "laliga-news": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
-    "seriea-news": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
-    "bundesliga-news": "https://www.bbc.co.uk/sport/football/german-bundesliga/rss.xml",
-    "ligue1-news": "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml",
-    "ucl-news": "https://www.bbc.co.uk/sport/football/european-cup/rss.xml",
-    
-    // Transfer Feeds
-    "transfer-news": "https://www.bbc.co.uk/sport/football/transfers/rss.xml",
-    "skysports-transfers": "https://www.skysports.com/transfer-news/rss.xml",
-    "espn-transfers": "https://www.espn.com/espn/rss/soccer/news"
+
+"pl-news":"https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
+"laliga-news":"https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
+"seriea-news":"https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
+"bundesliga-news":"https://www.bbc.co.uk/sport/football/german-bundesliga/rss.xml",
+"ligue1-news":"https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml",
+"ucl-news":"https://www.bbc.co.uk/sport/football/european-cup/rss.xml",
+
+"transfer-news":"https://www.bbc.co.uk/sport/football/transfers/rss.xml",
+"skysports-transfers":"https://www.skysports.com/transfer-news/rss.xml",
+"espn-transfers":"https://www.espn.com/espn/rss/soccer/news"
+
 };
 
-const topStoryDiv = document.getElementById('top-story');
+const topStoryDiv=document.getElementById("top-story");
 
-async function fetchRSS(feedUrl) {
-    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        return data.items || [];
-    } catch (err) {
-        console.error('Error fetching RSS:', err);
-        return [];
-    }
+async function fetchRSS(feedUrl){
+
+const api=`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
+
+try{
+
+const response=await fetch(api);
+const data=await response.json();
+
+return data.items || [];
+
+}catch(err){
+
+console.error(err);
+return[];
+
 }
 
-function extractImageFromDescription(description) {
-    if (!description) return null;
-    const imgMatch = description.match(/<img[^>]+src="([^">]+)"/);
-    return imgMatch ? imgMatch[1] : null;
 }
 
-function upgradeImageQuality(imageUrl) {
-    if (!imageUrl) return null;
-    
-    // Upgrade BBC images
-    if (imageUrl.includes('ichef.bbci.co.uk')) {
-        imageUrl = imageUrl.replace(/\/\d+\//, '/1280/');
-        return imageUrl;
-    }
-    
-    // Upgrade ESPN images
-    if (imageUrl.includes('espn')) {
-        return imageUrl.replace(/\?.*$/, '?w=1280');
-    }
-    
-    return imageUrl;
+function extractImage(description){
+
+if(!description)return null;
+
+const match=description.match(/<img[^>]+src="([^">]+)"/);
+
+return match?match[1]:null;
+
 }
 
-async function loadNews() {
-    let topStorySet = false;
-    
-    for (const section in feeds) {
-        const container = document.getElementById(section);
-        if (!container) continue;
-        
-        try {
-            const items = await fetchRSS(feeds[section]);
-            container.innerHTML = '';
-            
-            if (items.length === 0) {
-                container.innerHTML = '<p style="color:#999;">No articles available</p>';
-                continue;
-            }
-            
-            items.slice(0, 5).forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'headline';
-                div.style.marginBottom = '15px';
-                div.style.paddingBottom = '15px';
-                div.style.borderBottom = '1px solid #ddd';
-                
-                // Get image
-                let imageUrl = null;
-                
-                if (item.enclosure && item.enclosure.link) {
-                    imageUrl = item.enclosure.link;
-                } else if (item.thumbnail) {
-                    imageUrl = item.thumbnail;
-                } else if (item.image) {
-                    imageUrl = item.image;
-                } else if (item.description) {
-                    imageUrl = extractImageFromDescription(item.description);
-                }
-                
-                // Upgrade image quality
-                imageUrl = upgradeImageQuality(imageUrl);
-                
-                // Build HTML
-                let html = '';
-                
-                if (imageUrl) {
-                    html += `<img src="${imageUrl}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:10px; border-radius:4px; object-fit:cover;" onerror="this.style.display='none'">`;
-                }
-                
-                html += `
-                    <a href="${item.link}" target="_blank" style="font-weight:bold; text-decoration:none; color:#000; display:block;">
-                        ${item.title}
-                    </a>
-                    <p style="font-size:0.85em; color:#999; margin-top:5px; margin-bottom:0;">
-                        ${item.pubDate ? new Date(item.pubDate).toLocaleDateString() : 'Recent'} | <a href="${item.link}" target="_blank" style="color:#0066cc; text-decoration:none;">Follow your club</a>
-                    </p>
-                `;
-                
-                div.innerHTML = html;
-                container.appendChild(div);
-                
-                // Set top story
-                if (!topStorySet && imageUrl) {
-                    topStoryDiv.innerHTML = `
-                        <img src="${imageUrl}" alt="${item.title}" style="width:100%; height:auto; margin-bottom:15px; border-radius:4px; object-fit:cover;" onerror="this.style.display='none'">
-                        <a href="${item.link}" target="_blank" style="font-weight:bold; text-decoration:none; color:#000; font-size:1.5em;">
-                            ${item.title}
-                        </a>
-                        <p style="margin-top:10px;"><a href="${item.link}" target="_blank" style="background:#0066cc; color:#fff; padding:10px 20px; text-decoration:none; border-radius:4px; display:inline-block;">Follow your club</a></p>
-                    `;
-                    topStorySet = true;
-                }
-            });
-        } catch (err) {
-            container.innerHTML = '<p style="color:#cc0000;">Failed to load articles</p>';
-            console.error(`Error fetching ${section}:`, err);
-        }
-    }
+function upgradeImage(image){
+
+if(!image)return null;
+
+if(image.includes("ichef.bbci.co.uk")){
+
+return image.replace(/\/\d+\//,"/1280/");
+
 }
 
-function showCategory(category) {
-    // Hide all sections
-    document.getElementById('news').classList.add('hidden');
-    document.getElementById('transfers').classList.add('hidden');
-    
-    // Show selected section
-    document.getElementById(category).classList.remove('hidden');
-    
-    // Update button active state
-    document.querySelectorAll('.category-tabs button').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    event.target.classList.add('active');
-    
-    // Load news if not already loaded
-    loadNews();
+return image;
+
 }
 
-// Load news when page loads
-window.addEventListener('load', loadNews);
-loadNews();
+async function loadNews(){
+
+let topStorySet=false;
+
+for(const section in feeds){
+
+const container=document.getElementById(section);
+
+if(!container)continue;
+
+const items=await fetchRSS(feeds[section]);
+
+container.innerHTML="";
+
+if(items.length===0){
+
+container.innerHTML="<p>No articles available</p>";
+
+continue;
+
+}
+
+items.slice(0,5).forEach(item=>{
+
+const div=document.createElement("div");
+
+div.className="headline";
+
+let image=null;
+
+if(item.thumbnail)image=item.thumbnail;
+
+else if(item.enclosure && item.enclosure.link)image=item.enclosure.link;
+
+else if(item.description)image=extractImage(item.description);
+
+image=upgradeImage(image);
+
+let html="";
+
+if(image){
+
+html+=`<img src="${image}" style="margin-bottom:8px">`;
+
+}
+
+html+=`
+
+<a href="${item.link}" target="_blank">
+${item.title}
+</a>
+
+<p style="font-size:0.8em;color:#999">
+${new Date(item.pubDate).toLocaleDateString()}
+</p>
+
+`;
+
+div.innerHTML=html;
+
+container.appendChild(div);
+
+if(!topStorySet && image){
+
+topStoryDiv.innerHTML=`
+
+<img src="${image}" style="margin-bottom:15px">
+
+<a href="${item.link}" target="_blank">
+${item.title}
+</a>
+
+`;
+
+topStorySet=true;
+
+}
+
+});
+
+}
+
+}
+
+function showCategory(category,event){
+
+document.getElementById("news").classList.add("hidden");
+document.getElementById("transfers").classList.add("hidden");
+
+document.getElementById(category).classList.remove("hidden");
+
+document.querySelectorAll(".category-tabs button").forEach(btn=>{
+btn.classList.remove("active");
+});
+
+event.target.classList.add("active");
+
+}
+
+window.addEventListener("load",loadNews);
