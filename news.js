@@ -1,19 +1,18 @@
 // news.js
 
-// Mapping of section IDs to RSS feed URLs
 const feeds = {
     "pl-news": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
     "laliga-news": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
     "seriea-news": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
     "bundesliga-news": "https://www.bbc.co.uk/sport/football/german-bundesliga/rss.xml",
     "ligue1-news": "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml",
-    "ucl-news": "https://www.uefa.com/rssfeed/news/rss.xml", // UEFA Champions League
-    "transfer-news": "https://www.transfermarkt.com/rss/news", // general transfer news
-    "skysports-transfers": "https://www.skysports.com/feeds/11095/transfer-news", 
+    "ucl-news": "https://www.bbc.co.uk/sport/football/champions-league/rss.xml",
+    "transfer-news": "https://www.transfermarkt.com/rss/news",
+    "skysports-transfers": "https://www.skysports.com/feeds/11095/transfer-news",
     "espn-transfers": "https://www.espn.com/espn/rss/soccer/news"
 };
 
-// Utility function to fetch RSS via rss2json.com
+// Fetch RSS via rss2json.com
 async function fetchRSS(feedUrl) {
     const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feedUrl)}`;
     try {
@@ -26,7 +25,7 @@ async function fetchRSS(feedUrl) {
     }
 }
 
-// Load top story (first headline from Premier League)
+// Load top story from Premier League
 async function loadTopStory() {
     const topStoryDiv = document.getElementById("top-story");
     const items = await fetchRSS(feeds["pl-news"]);
@@ -37,13 +36,13 @@ async function loadTopStory() {
     }
 }
 
-// Load news for a section
+// Load a section
 async function loadSection(sectionId) {
     const container = document.getElementById(sectionId);
     const items = await fetchRSS(feeds[sectionId]);
     container.innerHTML = "";
     if (items.length === 0) {
-        container.innerHTML = "Failed to load news.";
+        container.innerHTML = "No articles available.";
         return;
     }
     items.slice(0, 5).forEach(item => {
@@ -62,7 +61,7 @@ async function loadAllNews() {
     }
 }
 
-// Initialize everything on page load
+// Initialize on page load
 document.addEventListener("DOMContentLoaded", () => {
     loadAllNews();
 });
