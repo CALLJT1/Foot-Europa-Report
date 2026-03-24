@@ -9,10 +9,6 @@ body { font-family: Arial, Helvetica, sans-serif; background: #f4f4f4; margin:0;
 header { background:#000; color:#fff; padding:15px 20px; text-align:center; font-size:2em; font-weight:bold; }
 main { width:90%; max-width:1200px; margin:20px auto; }
 .top-story { text-align:center; font-size:1.8em; font-weight:bold; margin-bottom:30px; }
-.category-tabs { display:flex; gap:10px; margin-bottom:20px; justify-content:center; }
-.category-tabs button { padding:10px 20px; background:#000; color:#fff; border:none; cursor:pointer; border-radius:4px; transition: background 0.3s; }
-.category-tabs button.active { background:#0066cc; }
-.category-tabs button:hover { background:#333; }
 .news-section { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
 .column { flex:1; min-width:250px; }
 .column h3 { background:#000; color:#fff; padding:8px; margin-bottom:10px; border-radius:4px; text-align:center; }
@@ -20,8 +16,9 @@ main { width:90%; max-width:1200px; margin:20px auto; }
 .headline a { text-decoration:none; color:#000; display:block; }
 .headline a:hover { text-decoration:underline; }
 footer { text-align:center; margin:40px 0; font-size:0.9em; color:#555; }
-.hidden { display:none; }
 img { max-width:100%; border-radius:4px; display:block; margin:0 auto 5px auto; object-fit:cover; }
+.follow-club { display:block; margin-top:5px; font-weight:bold; font-size:1em; text-decoration:none; color:#0066cc; }
+.follow-club:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
@@ -31,12 +28,6 @@ img { max-width:100%; border-radius:4px; display:block; margin:0 auto 5px auto; 
 <main>
     <!-- Top Story -->
     <div id="top-story" class="top-story">Loading top story...</div>
-
-    <!-- Category Tabs -->
-    <div class="category-tabs">
-        <button class="active" onclick="showCategory('news', event)">📰 News</button>
-        <button onclick="showCategory('transfers', event)">🔄 Transfers</button>
-    </div>
 
     <!-- News Section -->
     <div id="news" class="news-section">
@@ -65,26 +56,10 @@ img { max-width:100%; border-radius:4px; display:block; margin:0 auto 5px auto; 
             <div id="ucl-news"></div>
         </div>
     </div>
-
-    <!-- Transfers Section -->
-    <div id="transfers" class="news-section hidden">
-        <div class="column" id="transfer-news"></div>
-        <div class="column" id="skysports-transfers"></div>
-        <div class="column" id="espn-transfers"></div>
-    </div>
 </main>
 
 <footer>© 2026 Foot Europa Report | Follow Your Club</footer>
 
 <script src="news.js"></script>
-<script>
-function showCategory(category, event){
-    ['news','transfers'].forEach(id=>{document.getElementById(id).classList.add('hidden');});
-    document.getElementById(category).classList.remove('hidden');
-    document.querySelectorAll('.category-tabs button').forEach(btn=>btn.classList.remove('active'));
-    if(event) event.target.classList.add('active');
-}
-</script>
-
 </body>
 </html>
