@@ -3,11 +3,7 @@ const feeds = {
     "laliga-news": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
     "seriea-news": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
     "bundesliga-news": "https://www.bbc.co.uk/sport/football/german-bundesliga/rss.xml",
-    "ligue1-news": "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml",
-    "ucl-news": [
-        "https://www.skysports.com/rss/12040",  // UEFA Champions League Sky Sports
-        "https://www.espn.com/espn/rss/soccer/news"  // General ESPN soccer feed
-    ]
+    "ligue1-news": "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml"
 };
 
 const topStoryDiv = document.getElementById('top-story');
@@ -43,21 +39,7 @@ async function loadNews(){
         const container = document.getElementById(section);
         if(!container) continue;
 
-        let items = [];
-        if(Array.isArray(feeds[section])){
-            // Merge multiple feeds
-            for(const feedUrl of feeds[section]){
-                const fetched = await fetchRSS(feedUrl);
-                items = items.concat(fetched);
-            }
-
-            // For UEFA Champions League, filter only relevant soccer articles
-            items = items.filter(item => 
-                /champions league|uefa/i.test(item.title)
-            );
-        } else {
-            items = await fetchRSS(feeds[section]);
-        }
+        let items = await fetchRSS(feeds[section]);
 
         container.innerHTML = '';
         if(items.length === 0){
@@ -74,13 +56,13 @@ async function loadNews(){
 
             let html = '';
             if(img){
-                html += `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>`;
+                html += `<a href="${item.link}" target="_blank"><img src="${img}" alt="" style="width:100%; height:auto;"></a>`;
             }
             html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
 
-            // Top story: show only image + title (no follow link)
-            if(!topSet && img && section !== "ucl-news"){
-                topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
+            // Top story: show only image + title
+            if(!topSet && img){
+                topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt="" style="width:100%; height:auto;"></a>
                                          <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.5em; display:block; margin-top:5px;">${item.title}</a>`;
                 topSet = true;
             }
