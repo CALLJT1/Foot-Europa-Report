@@ -61,16 +61,24 @@ async function loadNews(){
             div.className='headline';
 
             let html = '';
-            if(img){
-                html += `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>`;
+            if(section.includes("transfer")){
+                // For transfers: only image linked
+                if(img){
+                    html += `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>`;
+                }
+            } else {
+                // For news: image + title
+                if(img){
+                    html += `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>`;
+                }
+                html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
             }
-            html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
 
             div.innerHTML = html;
             container.appendChild(div);
 
             // Set top story only once
-            if(!topSet && img){
+            if(!topSet && img && !section.includes("transfer")){
                 topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
                                          <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.5em; display:block; margin-top:5px;">${item.title}</a>`;
                 topSet = true;
