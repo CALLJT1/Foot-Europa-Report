@@ -23,7 +23,6 @@ try{
 
 const response=await fetch(api);
 const data=await response.json();
-
 return data.items || [];
 
 }catch(err){
@@ -40,7 +39,6 @@ function extractImage(description){
 if(!description)return null;
 
 const match=description.match(/<img[^>]+src="([^">]+)"/);
-
 return match?match[1]:null;
 
 }
@@ -50,9 +48,7 @@ function upgradeImage(image){
 if(!image)return null;
 
 if(image.includes("ichef.bbci.co.uk")){
-
 return image.replace(/\/\d+\//,"/1280/");
-
 }
 
 return image;
@@ -76,7 +72,6 @@ container.innerHTML="";
 if(items.length===0){
 
 container.innerHTML="<p>No articles available</p>";
-
 continue;
 
 }
@@ -84,15 +79,12 @@ continue;
 items.slice(0,5).forEach(item=>{
 
 const div=document.createElement("div");
-
 div.className="headline";
 
 let image=null;
 
 if(item.thumbnail)image=item.thumbnail;
-
 else if(item.enclosure && item.enclosure.link)image=item.enclosure.link;
-
 else if(item.description)image=extractImage(item.description);
 
 image=upgradeImage(image);
@@ -100,9 +92,7 @@ image=upgradeImage(image);
 let html="";
 
 if(image){
-
 html+=`<img src="${image}" style="margin-bottom:8px">`;
-
 }
 
 html+=`
@@ -125,9 +115,11 @@ if(!topStorySet && image){
 
 topStoryDiv.innerHTML=`
 
-<img src="${image}" style="margin-bottom:15px">
+<img src="${image}" style="width:50%;margin-bottom:15px;border-radius:4px">
 
-<a href="${item.link}" target="_blank">
+<br>
+
+<a href="${item.link}" target="_blank" style="font-size:1.4em;text-decoration:none;color:#000;font-weight:bold;">
 ${item.title}
 </a>
 
