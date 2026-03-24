@@ -6,7 +6,7 @@ const feeds = {
     "ligue1-news": "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml",
     "ucl-news": [
         "https://www.skysports.com/rss/12040",  // UEFA Champions League Sky Sports
-        "https://www.espn.com/espn/rss/soccer/news"  // General soccer feed from ESPN
+        "https://www.espn.com/espn/rss/soccer/news"  // General ESPN soccer feed
     ]
 };
 
@@ -45,17 +45,22 @@ async function loadNews(){
 
         let items = [];
         if(Array.isArray(feeds[section])){
-            // Merge multiple feeds for UEFA Champions League
+            // Merge multiple feeds
             for(const feedUrl of feeds[section]){
                 const fetched = await fetchRSS(feedUrl);
                 items = items.concat(fetched);
             }
+
+            // For UEFA Champions League, filter only relevant soccer articles
+            items = items.filter(item => 
+                /champions league|uefa/i.test(item.title)
+            );
         } else {
             items = await fetchRSS(feeds[section]);
         }
 
         container.innerHTML = '';
-        if(items.length===0){
+        if(items.length === 0){
             container.innerHTML = '<p style="color:#999;">No articles available</p>';
             continue;
         }
@@ -73,7 +78,7 @@ async function loadNews(){
             }
             html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
 
-            // Top story: image + title only (no link below)
+            // Top story: show only image + title (no follow link)
             if(!topSet && img && section !== "ucl-news"){
                 topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
                                          <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.5em; display:block; margin-top:5px;">${item.title}</a>`;
