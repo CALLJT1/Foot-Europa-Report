@@ -1,8 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+@@ -3,29 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Europa Report</title>
     <title>Foot Europa Report</title>
     <style>
         body { font-family: Arial, Helvetica, sans-serif; background: #f4f4f4; margin:0; padding:0; }
@@ -24,6 +24,27 @@
     </style>
 </head>
 <body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="#news">News</a></li>
+                <li><a href="#transfers">Transfers</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="news">
+            <h1>Latest News</h1>
+            <!-- News content goes here -->
+        </section>
+        <section id="transfers">
+            <h1>Transfers</h1>
+            <!-- Transfers content goes here -->
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 Europa Report</p>
+    </footer>
 
 <header>⚽ Foot Europa Report</header>
 
@@ -83,15 +104,6 @@
 <footer>© 2026 Foot Europa Report | Live news from multiple sources</footer>
 
 <script src="news.js"></script>
-<script>
-    // Tab switcher
-    function showCategory(category) {
-        document.getElementById('news').classList.add('hidden');
-        document.getElementById('transfers').classList.add('hidden');
-        document.getElementById(category).classList.remove('hidden');
-        document.querySelectorAll('.category-tabs button').forEach(btn => btn.classList.remove('active'));
-        document.querySelector(`.category-tabs button[onclick="showCategory('${category}')"]`).classList.add('active');
-    }
-</script>
 </body>
+</html>
 </html>
