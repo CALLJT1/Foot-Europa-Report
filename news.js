@@ -1,16 +1,13 @@
 const feeds = {
-    // News Feeds
     "pl-news": "https://www.bbc.co.uk/sport/football/premier-league/rss.xml",
     "laliga-news": "https://www.bbc.co.uk/sport/football/spanish-la-liga/rss.xml",
     "seriea-news": "https://www.bbc.co.uk/sport/football/italian-serie-a/rss.xml",
     "bundesliga-news": "https://www.bbc.co.uk/sport/football/german-bundesliga/rss.xml",
     "ligue1-news": "https://www.bbc.co.uk/sport/football/french-ligue-one/rss.xml",
-    "ucl-news": "https://www.bbc.co.uk/sport/football/european-cup/rss.xml",
-
-    // Transfer Feeds
-    "transfer-news": "https://www.bbc.co.uk/sport/football/transfers/rss.xml",
-    "skysports-transfers": "https://www.skysports.com/transfer-news/rss.xml",
-    "espn-transfers": "https://www.espn.com/espn/rss/soccer/news"
+    "ucl-news": [
+        "https://www.skysports.com/rss/12040",  // UEFA Champions League Sky Sports
+        "https://www.espn.com/espn/rss/soccer/news"  // General soccer feed from ESPN
+    ]
 };
 
 const topStoryDiv = document.getElementById('top-story');
@@ -46,7 +43,17 @@ async function loadNews(){
         const container = document.getElementById(section);
         if(!container) continue;
 
-        const items = await fetchRSS(feeds[section]);
+        let items = [];
+        if(Array.isArray(feeds[section])){
+            // Merge multiple feeds for UEFA Champions League
+            for(const feedUrl of feeds[section]){
+                const fetched = await fetchRSS(feedUrl);
+                items = items.concat(fetched);
+            }
+        } else {
+            items = await fetchRSS(feeds[section]);
+        }
+
         container.innerHTML = '';
         if(items.length===0){
             container.innerHTML = '<p style="color:#999;">No articles available</p>';
@@ -61,28 +68,21 @@ async function loadNews(){
             div.className='headline';
 
             let html = '';
-            if(section.includes("transfer")){
-                // For transfers: only image linked
-                if(img){
-                    html += `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>`;
-                }
-            } else {
-                // For news: image + title
-                if(img){
-                    html += `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>`;
-                }
-                html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
+            if(img){
+                html += `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>`;
+            }
+            html += `<a href="${item.link}" target="_blank">${item.title}</a>`;
+
+            // Add Follow Your Club link under top story only
+            if(!topSet && img && section !== "ucl-news"){
+                topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
+                                         <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.5em; display:block; margin-top:5px;">${item.title}</a>
+                                         <a href="${item.link}" class="follow-club" target="_blank">Follow Your Club</a>`;
+                topSet = true;
             }
 
             div.innerHTML = html;
             container.appendChild(div);
-
-            // Set top story only once
-            if(!topSet && img && !section.includes("transfer")){
-                topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank"><img src="${img}" alt=""></a>
-                                         <a href="${item.link}" target="_blank" style="font-weight:bold; font-size:1.5em; display:block; margin-top:5px;">${item.title}</a>`;
-                topSet = true;
-            }
         });
     }
 }
