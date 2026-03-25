@@ -29,19 +29,20 @@ const feeds = {
 
 const topStoryDiv = document.getElementById('top-story');
 
-// Fetch RSS via AllOrigins to bypass CORS
-async function fetchRSS(url){
+// Fetch RSS via AllOrigins and parse XML
+async function fetchRSS(url) {
     try {
         const apiUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
         const controller = new AbortController();
-        const timeout = setTimeout(()=>controller.abort(),8000);
+        const timeout = setTimeout(() => controller.abort(), 8000);
 
-        const res = await fetch(apiUrl, {signal: controller.signal});
+        const res = await fetch(apiUrl, { signal: controller.signal });
         clearTimeout(timeout);
 
-        const text = await res.text();
+        const json = await res.json(); // AllOrigins returns { contents: "...", status: ... }
+        const text = json.contents;
         const parser = new DOMParser();
-        const xml = parser.parseFromString(text,"text/xml");
+        const xml = parser.parseFromString(text, "text/xml");
 
         const items = Array.from(xml.querySelectorAll("item")).map(item => ({
             title: item.querySelector("title")?.textContent || "",
@@ -56,49 +57,51 @@ async function fetchRSS(url){
         }));
 
         return items;
-    } catch(e){
+    } catch (e) {
         console.error(`Failed to fetch ${url}`, e);
         return [];
     }
 }
 
 // Extract image from description if needed
-function extractImage(description){
-    if(!description) return null;
+function extractImage(description) {
+    if (!description) return null;
     const match = description.match(/<img[^>]+src="([^">]+)"/);
     return match ? match[1] : null;
 }
 
 // Upgrade image quality if BBC/ESPN
-function upgradeImage(url){
-    if(!url) return null;
-    if(url.includes('ichef.bbci.co.uk')) return url.replace(/\/\d+\//,'/1280/');
-    if(url.includes('espn')) return url.replace(/\?.*$/,'?w=1280');
+function upgradeImage(url) {
+    if (!url) return null;
+    if (url.includes('ichef.bbci.co.uk')) return url.replace(/\/\d+\//, '/1280/');
+    if (url.includes('espn')) return url.replace(/\?.*$/, '?w=1280');
     return url;
 }
 
 // Load all news
-async function loadNews(){
+async function loadNews() {
     let topSet = false;
 
-    for(const section in feeds){
+    for (const section in feeds) {
         const container = document.getElementById(section);
-        if(!container) continue;
+        if (!container) continue;
 
+        // Fetch all feeds in parallel
         const requests = feeds[section].map(url => fetchRSS(url));
         const results = await Promise.all(requests);
 
+        // Flatten and sort by publication date
         let items = results.flat();
-        items = items.sort((a,b)=>new Date(b.pubDate) - new Date(a.pubDate));
-        items = items.slice(0,5);
+        items = items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+        items = items.slice(0, 5); // top 5 per league
 
         container.innerHTML = '';
-        if(items.length === 0){
+        if (items.length === 0) {
             container.innerHTML = '<p style="color:#999;">No articles available</p>';
             continue;
         }
 
-        items.forEach(item=>{
+        items.forEach(item => {
             let img = upgradeImage(
                 item.enclosure?.link ||
                 item.thumbnail ||
@@ -107,15 +110,16 @@ async function loadNews(){
             );
 
             const div = document.createElement('div');
-            div.className='headline';
+            div.className = 'headline';
 
             let html = '';
-            if(img){
+            if (img) {
                 html += `<a href="${item.link}" target="_blank" rel="noopener noreferrer"><img src="${img}" loading="lazy" alt=""></a>`;
             }
             html += `<a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>`;
 
-            if(!topSet && img){
+            // Set top story
+            if (!topSet && img) {
                 topStoryDiv.innerHTML = `<a href="${item.link}" target="_blank" rel="noopener noreferrer"><img src="${img}" alt=""></a>
                                          <a href="${item.link}" target="_blank" rel="noopener noreferrer" style="font-weight:bold; font-size:1.3em; display:block; margin-top:5px;">${item.title}</a>`;
                 topSet = true;
@@ -126,7 +130,7 @@ async function loadNews(){
         });
     }
 
-    if(!topSet){
+    if (!topSet) {
         topStoryDiv.innerHTML = '<p style="color:#999;">No top story available</p>';
     }
 }
