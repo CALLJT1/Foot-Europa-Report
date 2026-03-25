@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Euro Goal News</title>
+<meta name="description" content="Latest European football news from Premier League, La Liga, Serie A, Bundesliga, and Ligue 1 from multiple sources.">
+<link rel="icon" href="favicon.ico">
 <style>
 body { font-family: Arial, Helvetica, sans-serif; background: #f4f4f4; margin:0; padding:0; }
 header { background:#000; color:#fff; padding:15px 20px; text-align:center; font-size:2em; font-weight:bold; }
@@ -12,7 +14,8 @@ main { width:90%; max-width:1200px; margin:20px auto; }
 .news-section { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; }
 .column { flex:1; min-width:200px; }
 .column h3 { background:#000; color:#fff; padding:8px; margin-bottom:10px; border-radius:4px; text-align:center; }
-.headline { margin:8px 0; text-align:center; }
+.headline { margin:8px 0; text-align:center; background:white; padding:10px; border-radius:6px; box-shadow:0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s; }
+.headline:hover { transform:scale(1.02); }
 .headline a { text-decoration:none; color:#000; display:block; font-size:0.9em; }
 .headline a:hover { text-decoration:underline; }
 footer { text-align:center; margin:40px 0; font-size:0.9em; color:#555; }
@@ -23,7 +26,10 @@ img { max-width:100%; border-radius:4px; display:block; margin:0 auto 5px auto; 
 </head>
 <body>
 
-<header>Euro Goal News</header>
+<header>
+Euro Goal News
+<p style="font-size:14px;font-weight:normal;">Latest European Football Headlines</p>
+</header>
 
 <main>
     <!-- Top Story -->
