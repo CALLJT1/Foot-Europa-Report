@@ -136,3 +136,70 @@ async function loadNews() {
 }
 
 window.addEventListener('load', loadNews);
+// server.js
+import express from 'express';
+import fetch from 'node-fetch';
+import xml2js from 'xml2js';
+
+const app = express();
+const port = 3000;
+
+const feeds = {
+  "pl-news": [
+    "https://feeds.bbci.co.uk/sport/football/premier-league/rss.xml",
+    "https://www.goal.com/en/feeds/news?tags=premier-league",
+    "https://www.skysports.com/rss/12040"
+  ],
+  "laliga-news": [
+    "https://feeds.bbci.co.uk/sport/football/spanish-la-liga/rss.xml",
+    "https://www.goal.com/en/feeds/news?tags=la-liga",
+    "https://www.skysports.com/rss/12044"
+  ],
+  "seriea-news": [
+    "https://feeds.bbci.co.uk/sport/football/italian-serie-a/rss.xml",
+    "https://www.goal.com/en/feeds/news?tags=serie-a",
+    "https://www.skysports.com/rss/12038"
+  ],
+  "bundesliga-news": [
+    "https://feeds.bbci.co.uk/sport/football/german-bundesliga/rss.xml",
+    "https://www.goal.com/en/feeds/news?tags=bundesliga",
+    "https://www.skysports.com/rss/12042"
+  ],
+  "ligue1-news": [
+    "https://feeds.bbci.co.uk/sport/football/french-ligue-one/rss.xml",
+    "https://www.goal.com/en/feeds/news?tags=ligue-1",
+    "https://www.skysports.com/rss/12045"
+  ]
+};
+
+// Fetch and parse XML feed
+async function fetchRSS(url) {
+  try {
+    const res = await fetch(url);
+    const text = await res.text();
+    const result = await xml2js.parseStringPromise(text, { explicitArray: false });
+    const items = result.rss.channel.item || [];
+    return Array.isArray(items) ? items : [items];
+  } catch (err) {
+    console.error(`Failed to fetch ${url}:`, err);
+    return [];
+  }
+}
+
+// Merge all feeds and return JSON
+app.get('/api/news', async (req, res) => {
+  const response = {};
+  for (const section in feeds) {
+    const requests = feeds[section].map(url => fetchRSS(url));
+    const results = await Promise.all(requests);
+    let items = results.flat();
+    // Sort by publication date descending
+    items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+    response[section] = items.slice(0, 5); // top 5 per league
+  }
+  res.json(response);
+});
+
+app.listen(port, () => {
+  console.log(`News API server running at http://localhost:${port}`);
+});
